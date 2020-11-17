@@ -1,0 +1,61 @@
+name:                hs-solver
+version:             0.1.0.0
+github:              "hyliancloud/INFO_Haskell_Project"
+license:             BSD3
+author:              "Vincent AGULLO & Emilie MARTI"
+maintainer:          "bgdu93@gmail.com"
+copyright:           "2020 Vincent Agullo & Emilie Marti"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/hyliancloud/INFO_Haskell_Project#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- containers >= 0.6
+- split >= 0.2
+
+library:
+  source-dirs: src
+  exposed-modules:
+    - Data.Logic.Combinator
+    - Data.Logic.Var
+    - Data.Logic.Var.Some
+    - Data.Logic.Fml
+    - Data.Logic.Fml.Some
+    - Data.Logic.Utils
+#     - Data.Logic.Solver
+
+# executables:
+#   hs-solver-exe:
+#     main:                Main.hs
+#     source-dirs:         app
+#     ghc-options:
+#     - -threaded
+#     - -rtsopts
+#     - -with-rtsopts=-N
+#     dependencies:
+#     - hs-solver
+
+tests:
+  hs-solver-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - hs-solver
+    - test-framework
+    - test-framework-hunit
+    - HUnit

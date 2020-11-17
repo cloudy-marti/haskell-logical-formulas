@@ -1,0 +1,62 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: d81e262f796d4003f36f012daf9e1a24c609f40306f5d97299f401fa63458975
+
+name:           hs-solver
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/hyliancloud/INFO_Haskell_Project#readme>
+homepage:       https://github.com/hyliancloud/INFO_Haskell_Project#readme
+bug-reports:    https://github.com/hyliancloud/INFO_Haskell_Project/issues
+author:         Vincent AGULLO & Emilie MARTI
+maintainer:     bgdu93@gmail.com
+copyright:      2020 Vincent Agullo & Emilie Marti
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/hyliancloud/INFO_Haskell_Project
+
+library
+  exposed-modules:
+      Data.Logic.Combinator
+      Data.Logic.Var
+      Data.Logic.Var.Some
+      Data.Logic.Fml
+      Data.Logic.Fml.Some
+      Data.Logic.Utils
+  other-modules:
+      Paths_hs_solver
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , containers >=0.6
+    , split >=0.2
+  default-language: Haskell2010
+
+test-suite hs-solver-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_hs_solver
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit
+    , base >=4.7 && <5
+    , containers >=0.6
+    , hs-solver
+    , split >=0.2
+    , test-framework
+    , test-framework-hunit
+  default-language: Haskell2010
