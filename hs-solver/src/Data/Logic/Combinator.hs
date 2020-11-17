@@ -1,5 +1,17 @@
 module Data.Logic.Combinator (
-
+-- * Type
+-- Combinator (..)
+-- * Utils
+-- , multOr
+-- , multAnd
+-- , allOf
+-- , noneOf
+-- , atLeast
+-- , atLeastOne
+-- , atMost
+-- , atMostOne
+-- , exactly
+-- , exactlyOne
 ) where
     import qualified Data.Logic.Var as Var
     import qualified Data.Logic.Fml as Fml
