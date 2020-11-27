@@ -1,0 +1,10 @@
+import qualified Data.Logic.Var as V
+import qualified Data.Logic.Fml as F
+vz = F.Final $ V.mk "z"
+vy = F.Final $ V.mk "y"
+vx = F.Final $ V.mk "x"
+putStrLn . F.prettyFormat $ F.Equiv (F.And vx vy) (F.Or vy (F.Not vz))
+F.vars $ F.Equiv (F.And vx vy) (F.Or vy (F.Not vz))
+
+F.vars $ F.And vx $ F.And vy $ F.Not $ F.Not $F.And vx $ F.And vy $ F.And vy $ F.Not vz
+

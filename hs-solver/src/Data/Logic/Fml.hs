@@ -3,7 +3,7 @@ module Data.Logic.Fml (
 Fml (..)
 -- * Querying
 -- , depth
--- , vars
+, vars
 -- * Formatting
 , prettyFormat
 -- * Transforming
@@ -19,15 +19,18 @@ Fml (..)
 -- , isDNF
 ) where
   import qualified Data.Logic.Var as Var
-  data Fml a = And (Fml a) (Fml a)
-    | NAnd (Fml a) (Fml a)
-    | Or (Fml a) (Fml a)
-    | NOr (Fml a) (Fml a)
-    | XOr (Fml a) (Fml a)
-    | XNOr (Fml a) (Fml a)
+  import qualified Data.List      as L
+  
+  data Fml a = 
+      And   (Fml a) (Fml a)
+    | NAnd  (Fml a) (Fml a)
+    | Or    (Fml a) (Fml a)
+    | NOr   (Fml a) (Fml a)
+    | XOr   (Fml a) (Fml a)
+    | XNOr  (Fml a) (Fml a)
     | Imply (Fml a) (Fml a)
     | Equiv (Fml a) (Fml a)
-    | Not (Fml a)
+    | Not   (Fml a)
     | Final (Var.Var a)
     deriving (Show)
 
@@ -42,21 +45,43 @@ Fml (..)
   -- equivalence: <=>
   -- not: -
   prettyFormat :: (Show a) => Fml a -> String
-  prettyFormat (And p q) = "(" ++ prettyFormat p ++ " . " ++ prettyFormat q ++ ")"
-  prettyFormat (NAnd p q) = "(" ++ prettyFormat p ++ " ~. " ++ prettyFormat q ++ ")"
-  prettyFormat (Or p q) = "(" ++ prettyFormat p ++ " + " ++ prettyFormat q ++ ")"
-  prettyFormat (NOr p q) = "(" ++ prettyFormat p ++ " ~+ " ++ prettyFormat q ++ ")"
-  prettyFormat (XOr p q) = "(" ++ prettyFormat p ++ " x+ " ++ prettyFormat q ++ ")"
-  prettyFormat (XNOr p q) = "(" ++ prettyFormat p ++ " x~+ " ++ prettyFormat q ++ ")"
+  prettyFormat (And p q)   = "(" ++ prettyFormat p ++ " . " ++ prettyFormat q ++ ")"
+  prettyFormat (NAnd p q)  = "(" ++ prettyFormat p ++ " ~. " ++ prettyFormat q ++ ")"
+  prettyFormat (Or p q)    = "(" ++ prettyFormat p ++ " + " ++ prettyFormat q ++ ")"
+  prettyFormat (NOr p q)   = "(" ++ prettyFormat p ++ " ~+ " ++ prettyFormat q ++ ")"
+  prettyFormat (XOr p q)   = "(" ++ prettyFormat p ++ " x+ " ++ prettyFormat q ++ ")"
+  prettyFormat (XNOr p q)  = "(" ++ prettyFormat p ++ " x~+ " ++ prettyFormat q ++ ")"
   prettyFormat (Imply p q) = "(" ++ prettyFormat p ++ " => " ++ prettyFormat q ++ ")"
   prettyFormat (Equiv p q) = "(" ++ prettyFormat p ++ " <=> " ++ prettyFormat q ++ ")"
-  prettyFormat (Not p) = "-" ++ prettyFormat p
-  prettyFormat (Final v) = show v
-  -- to be completed...
+  prettyFormat (Not p)     = "-" ++ prettyFormat p
+  prettyFormat (Final v)   = show v
+
+  -- |’getFmls’ @p@ returns formula into a list of formula @p@.
+  getFmls :: (Eq a) => Fml a -> [Fml a]
+  getFmls (And p q)   = getFmls p ++ getFmls q
+  getFmls (NAnd p q)  = getFmls p ++ getFmls q
+  getFmls (Or p q)    = getFmls p ++ getFmls q
+  getFmls (NOr p q)   = getFmls p ++ getFmls q
+  getFmls (XOr p q)   = getFmls p ++ getFmls q
+  getFmls (XNOr p q)  = getFmls p ++ getFmls q
+  getFmls (Imply p q) = getFmls p ++ getFmls q
+  getFmls (Equiv p q) = getFmls p ++ getFmls q
+  getFmls (Not p)     = getFmls p
+  getFmls final       = [final]
+
+  isFinal :: (Eq a) => Fml a -> Bool
+  isFinal (Final v)  = True
+
+  toVar:: Fml a -> Var.Var a
+  toVar (Final a) = a
 
   -- |’vars’ @p@ returns all variables that occur in formula @p@. Duplicate
   -- occurrences are removes.
-  -- vars :: (Eq a) => Fml a -> [Var.Var a]
+  vars :: (Eq a) => Fml a -> [Var.Var a]
+  vars = L.nub . L.map toVar . L.filter isFinal . getFmls
+   
+
+
 
   -- |’depth’ @p@ return the depth of fomula @p@.
   -- depth :: (Num b, Ord b) => Fml a -> b

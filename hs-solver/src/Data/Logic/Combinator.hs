@@ -1,6 +1,5 @@
 module Data.Logic.Combinator (
 -- * Type
--- Combinator (..)
 -- * Utils
 -- , multOr
 -- , multAnd
