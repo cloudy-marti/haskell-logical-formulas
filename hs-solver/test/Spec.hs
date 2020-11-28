@@ -35,12 +35,36 @@ testFmlGetAllVarsFromFormula =
                            where 
                                c = Fml.And vx $ Fml.NAnd vb $ Fml.Or va $ Fml.NOr vb $ Fml.And vx $ Fml.Imply vz $ Fml.Equiv vc $ Fml.Not vx
 
+------------------------------------------- depth TEST -------------------------------------------------------
+
+testFmlDephOfFormula :: Test
+testFmlDephOfFormula = TestCase $ assertEqual "Should return 0 for formula" 0 (Fml.depth vx)
+
+testFmlDephNotfFormula :: Test
+testFmlDephNotfFormula = 
+    TestCase $ assertEqual "Should return 1 for negation of formula" 1 (Fml.depth c)
+                           where 
+                               c = Fml.Not vx
+ 
+testFmlDephNotNotOfFormula :: Test
+testFmlDephNotNotOfFormula = 
+    TestCase $ assertEqual "Should return 2 for negation of negation of formula" 2 (Fml.depth c)
+                           where 
+                               c = Fml.Not $ Fml.Not vx   
+
+testFmlMaxDephFormula :: Test
+testFmlMaxDephFormula = 
+    TestCase $ assertEqual "Should return 2, the max depht of a formula" 2 (Fml.depth c)
+                           where 
+                               c = Fml.Or vx $ Fml.Not vy                       
 
 ---------------------------------------------- MAIN -----------------------------------------------------------
 main :: IO ()
 main = do
     -- FML
     runTestTT $ TestList [testFmlGetVarFromFormula, testFmlGetVarFromFormula2,                                  -- vars
-                          testFmlUniqueVarsFromFormula, testFmlGetAllVarsFromFormula                             
-                         ]
+                          testFmlUniqueVarsFromFormula, testFmlGetAllVarsFromFormula,                             
+                          testFmlDephOfFormula, testFmlDephNotfFormula, testFmlDephNotNotOfFormula,             -- depth
+                          testFmlMaxDephFormula
+                          ]
     return()    

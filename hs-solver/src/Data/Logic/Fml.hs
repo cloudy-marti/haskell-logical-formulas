@@ -2,7 +2,7 @@ module Data.Logic.Fml (
 -- * Type
 Fml (..)
 -- * Querying
--- , depth
+, depth
 , vars
 -- * Formatting
 , prettyFormat
@@ -79,13 +79,20 @@ Fml (..)
   -- occurrences are removes.
   vars :: (Eq a) => Fml a -> [Var.Var a]
   vars = L.nub . L.map toVar . L.filter isFinal . getFmls
-   
-
-
 
   -- |’depth’ @p@ return the depth of fomula @p@.
-  -- depth :: (Num b, Ord b) => Fml a -> b
-
+  depth :: (Eq a) => Fml a -> Int
+  depth (Final _)   = 0
+  depth (Not v)     = 1 + depth v 
+  depth (And p q)   = 1 + depth p + depth q
+  depth (NAnd p q)  = 1 + depth p + depth q
+  depth (Or p q)    = 1 + depth p + depth q
+  depth (NOr p q)   = 1 + depth p + depth q
+  depth (XOr p q)   = 1 + depth p + depth q
+  depth (XNOr p q)  = 1 + depth p + depth q
+  depth (Imply p q) = 1 + depth p + depth q
+  depth (Equiv p q) = 1 + depth p + depth q
+  
   -- |’toNNF’ @f@ converts the formula @f@ to NNF.
   -- toNNF :: Fml a -> Fml a
 
