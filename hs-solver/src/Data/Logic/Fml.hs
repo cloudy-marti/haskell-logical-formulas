@@ -76,25 +76,26 @@ Fml (..)
   toVar (Final a) = a
 
   -- |’vars’ @p@ returns all variables that occur in formula @p@. Duplicate
-  -- occurrences are removes.
+  -- occurrences are removed.
   vars :: (Eq a) => Fml a -> [Var.Var a]
   vars = L.nub . L.map toVar . L.filter isFinal . getFmls
 
   -- |’depth’ @p@ return the depth of fomula @p@.
   depth :: (Eq a) => Fml a -> Int
   depth (Final _)   = 0
-  depth (Not v)     = 1 + depth v 
-  depth (And p q)   = 1 + depth p + depth q
-  depth (NAnd p q)  = 1 + depth p + depth q
-  depth (Or p q)    = 1 + depth p + depth q
-  depth (NOr p q)   = 1 + depth p + depth q
-  depth (XOr p q)   = 1 + depth p + depth q
-  depth (XNOr p q)  = 1 + depth p + depth q
-  depth (Imply p q) = 1 + depth p + depth q
-  depth (Equiv p q) = 1 + depth p + depth q
+  depth (Not _)     = 1
+  depth (And p q)   = 1 + max (depth p) (depth q)
+  depth (NAnd p q)  = 1 + max (depth p) (depth q)
+  depth (Or p q)    = 1 + max (depth p) (depth q)
+  depth (NOr p q)   = 1 + max (depth p) (depth q)
+  depth (XOr p q)   = 1 + max (depth p) (depth q)
+  depth (XNOr p q)  = 1 + max (depth p) (depth q)
+  depth (Imply p q) = 1 + max (depth p) (depth q)
+  depth (Equiv p q) = 1 + max (depth p) (depth q)
   
   -- |’toNNF’ @f@ converts the formula @f@ to NNF.
   -- toNNF :: Fml a -> Fml a
+  -- toNNF 
 
   -- |’toCNF’ @f@ converts the formula @f@ to CNF.
   -- toCNF :: Fml a -> Fml a
@@ -102,14 +103,14 @@ Fml (..)
   -- |’toDNF’ @f@ converts the formula @f@ to DNF.
   -- toDNF :: Fml a -> Fml a
 
-  -- |’isNNF’ @f@ returns true iff formula @f@ is NNF.
-  -- isNNF :: Fml a -> Fml a
+  -- |’isNNF’ @f@ returns true if formula @f@ is NNF.
+  -- isNNF :: Fml a -> Bool
 
-  -- |’isCNF’ @f@ returns true iff formula @f@ is CNF.
-  -- isCNF :: Fml a -> Fml a
+  -- |’isCNF’ @f@ returns true if formula @f@ is CNF.
+  -- isCNF :: Fml a -> Bool
 
-  -- |’isDNF’ @f@ returns true iff formula @f@ is DNF.
-  -- isDNF :: Fml a -> Fml a
+  -- |’isDNF’ @f@ returns true if formula @f@ is DNF.
+  -- isDNF :: Fml a -> Bool
 
   -- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
   -- to formula @p@.
