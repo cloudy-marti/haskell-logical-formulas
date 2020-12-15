@@ -70,7 +70,7 @@ Fml (..)
   getFmls final       = [final]
 
   isFinal :: (Eq a) => Fml a -> Bool
-  isFinal (Final v)  = True
+  isFinal (Final _)  = True
 
   toVar:: Fml a -> Var.Var a
   toVar (Final a) = a
@@ -83,7 +83,7 @@ Fml (..)
   -- |’depth’ @p@ return the depth of fomula @p@.
   depth :: (Eq a) => Fml a -> Int
   depth (Final _)   = 0
-  depth (Not _)     = 1
+  depth (Not p)     = 1 + depth p
   depth (And p q)   = 1 + max (depth p) (depth q)
   depth (NAnd p q)  = 1 + max (depth p) (depth q)
   depth (Or p q)    = 1 + max (depth p) (depth q)
@@ -92,6 +92,15 @@ Fml (..)
   depth (XNOr p q)  = 1 + max (depth p) (depth q)
   depth (Imply p q) = 1 + max (depth p) (depth q)
   depth (Equiv p q) = 1 + max (depth p) (depth q)
+
+  -- reduceFormula :: Fml a -> Fml a
+  -- reduceFormula (Final a)   = Final a
+  -- reduceFormula (Not a)     = Not a
+  -- reduceFormula (And p q)   = And (reduceFormula p) (reduceFormula q)
+  -- reduceFormula (NAnd p q)  = Not . And (reduceFormula p) (reduceFormula q)
+  -- reduceFormula (Or p q)    = Or (reduceFormula p) (reduceFormula q)
+  -- reduceFormula (NOr p q)   = Not . Or (reduceFormula p) (reduceFormula q)
+  -- reduceFormula (XOr p q)   = 
   
   -- |’toNNF’ @f@ converts the formula @f@ to NNF.
   -- toNNF :: Fml a -> Fml a
