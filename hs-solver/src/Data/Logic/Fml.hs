@@ -109,7 +109,7 @@ Fml (..)
                               (Not $ And (Not (reduceFormula p)) (Not (reduceFormula q)))
   reduceFormula (Imply p q) = Or
                               (Not (reduceFormula p))
-                              (And (reduceFormula p) (reduceFormula q))
+                              (reduceFormula q)
   reduceFormula (Equiv p q) = reduceFormula $ XNOr p q
 
   -- |'morganLaw' Apply Not operator to formula
