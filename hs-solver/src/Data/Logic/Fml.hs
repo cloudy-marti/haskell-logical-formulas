@@ -215,7 +215,10 @@ Fml (..)
 
   -- |’isUniversalNOr’ @p@ returns true iff formula @p@ uses only NOR
   -- and variables.
-  -- isUniversalNOr :: Fml a -> Bool
+  isUniversalNOr :: Fml a -> Bool
+  isUniversalNOr (Final _)    = True
+  isUniversalNOr (NOr p q)    = isUniversalNOr p && isUniversalNOr q
+  isUniversalNOr _            = False
 
   -- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
   -- toCCNF :: Fml a -> Fml a
