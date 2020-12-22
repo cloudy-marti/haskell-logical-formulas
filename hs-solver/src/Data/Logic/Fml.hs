@@ -184,7 +184,15 @@ Fml (..)
 
   -- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
   -- to formula @p@.
-  -- toUniversalNAnd :: Fml a -> Fml a
+  toUniversalNAnd :: Fml a -> Fml a
+  toUniversalNAnd (Final p) = Final p
+  toUniversalNAnd (Not p)   = NAnd (toUniversalNAnd p) (toUniversalNAnd p)
+  toUniversalNAnd (Or p q)  = NAnd
+                              (NAnd (toUniversalNAnd p) (toUniversalNAnd p))
+                              (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
+  toUniversalNAnd (And p q) = NAnd
+                              (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
+                              (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
 
   -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
   -- to formula @p@.
