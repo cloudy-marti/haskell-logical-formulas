@@ -155,7 +155,12 @@ Fml (..)
   toDNF (And p q)         = Or (toDNF $ toNNF p) (toDNF $ toNNF q)
 
   -- |’isNNF’ @f@ returns true if formula @f@ is NNF.
-  -- isNNF :: Fml a -> Bool
+  isNNF :: Fml a -> Bool
+  isNNF (Not p)   = isNNF p
+  isNNF (Or p q)  = isNNF p && isNNF q
+  isNNF (And p q) = isNNF p && isNNF q
+  isNNF (Final p) = True
+  isNNF _         = False
 
   -- |’isCNF’ @f@ returns true if formula @f@ is CNF.
   -- isCNF :: Fml a -> Bool
