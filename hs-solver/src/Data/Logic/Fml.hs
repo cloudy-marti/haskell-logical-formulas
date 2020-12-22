@@ -92,62 +92,29 @@ Fml (..)
   depth (XNOr p q)  = 1 + max (depth p) (depth q)
   depth (Imply p q) = 1 + max (depth p) (depth q)
   depth (Equiv p q) = 1 + max (depth p) (depth q)
-
-  -- |'reduceFormula' Delete all operators but Not, Or, And
-  reduceFormula :: Fml a -> Fml a
-  reduceFormula (Final a)   = Final a
-  reduceFormula (Not p)     = Not p
-  reduceFormula (And p q)   = And (reduceFormula p) (reduceFormula q)
-  reduceFormula (NAnd p q)  = Not $ And (reduceFormula p) (reduceFormula q)
-  reduceFormula (Or p q)    = Or (reduceFormula p) (reduceFormula q)
-  reduceFormula (NOr p q)   = Not $ Or (reduceFormula p) (reduceFormula q)
-  reduceFormula (XOr p q)   = And
-                              (Not $ And (reduceFormula p) (reduceFormula q))
-                              (Not $ And (Not (reduceFormula p)) (Not (reduceFormula q)))
-  reduceFormula (XNOr p q)  = Not $ And
-                              (Not $ And (reduceFormula p) (reduceFormula q))
-                              (Not $ And (Not (reduceFormula p)) (Not (reduceFormula q)))
-  reduceFormula (Imply p q) = Or
-                              (Not (reduceFormula p))
-                              (reduceFormula q)
-  reduceFormula (Equiv p q) = And
-                              (Not $ And (reduceFormula p) (reduceFormula q))
-                              (Not $ And (Not (reduceFormula p)) (Not (reduceFormula q)))
-
-  -- |'morganLaw' Apply Not operator to formula
-  -- morganLaw :: Fml a -> Fml a
-  -- morganLaw (Final a) = Not $ Final a
-  -- morganLaw (Not p)   = p
-  -- morganLaw (And p q) = Or (Not p) (Not q)
-  -- morganLaw (Or p q)  = And (Not p) (Not q)
-  
   
   -- |’toNNF’ @f@ converts the formula @f@ to NNF.
-  -- toNNF :: Fml a -> Fml a
-  -- toNNF = reduceFormula
-
   toNNF :: Fml a -> Fml a
-  toNNF (And p q) = And (toNNF p) (toNNF q)
-  toNNF (Or p q)  = Or  (toNNF p) (toNNF q)
+  toNNF (And p q)         = And (toNNF p) (toNNF q)
+  toNNF (Or p q)          = Or  (toNNF p) (toNNF q)
   
   toNNF (Equiv p q)       = And (toNNF (Imply p q)) (toNNF (Imply q p))
   toNNF (Not(Equiv p q))  = Or  (And (toNNF p) (toNNF (Not q))) (And (toNNF (Not p)) (toNNF q))
 
-  toNNF (Imply p q)      = Or  (toNNF (Not p)) (toNNF q)
-  toNNF (Not(Imply p q)) = And  (toNNF p) (toNNF (Not q))
+  toNNF (Imply p q)       = Or  (toNNF (Not p)) (toNNF q)
+  toNNF (Not(Imply p q))  = And  (toNNF p) (toNNF (Not q))
 
-  toNNF (XOr p q)        = And (Or  (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
-  toNNF (XNOr p q)       = Or  (And (toNNF p) (toNNF q)) (And (toNNF (Not p)) (toNNF (Not q)))
+  toNNF (XOr p q)         = And (Or  (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
+  toNNF (XNOr p q)        = Or  (And (toNNF p) (toNNF q)) (And (toNNF (Not p)) (toNNF (Not q)))
 
-  toNNF (NAnd p q)      = Or  (toNNF (Not p)) (toNNF (Not q))
-  toNNF (NOr p q)       = And (toNNF (Not p)) (toNNF (Not q))
-  toNNF (Not (Or p q))  = toNNF (NOr p q)
-  toNNF (Not (And p q)) = toNNF (NAnd p q)
+  toNNF (NAnd p q)        = Or  (toNNF (Not p)) (toNNF (Not q))
+  toNNF (NOr p q)         = And (toNNF (Not p)) (toNNF (Not q))
+  toNNF (Not (Or p q))    = toNNF (NOr p q)
+  toNNF (Not (And p q))   = toNNF (NAnd p q)
 
-  toNNF (Not (Not p))  = toNNF p
-  toNNF (Not p)        = Not (toNNF p)
-  toNNF (Final p)      = Final p
-  
+  toNNF (Not (Not p))     = toNNF p
+  toNNF (Not p)           = Not (toNNF p)
+  toNNF (Final p)         = Final p
 
   -- |’toCNF’ @f@ converts the formula @f@ to CNF.
   -- toCNF :: Fml a -> Fml a
