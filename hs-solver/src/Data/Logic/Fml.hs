@@ -117,7 +117,23 @@ Fml (..)
   toNNF (Final p)         = Final p
 
   -- |’toCNF’ @f@ converts the formula @f@ to CNF.
-  -- toCNF :: Fml a -> Fml a
+  toCNF :: Fml a -> Fml a
+  toCNF (Final p)         = Final p   
+  toCNF (Not p)           = Not p
+  toCNF (And p q)         = And (toCNF $ toNNF p) (toCNF $ toNNF q)
+  toCNF (Or p (And q r))  = And
+                            (toCNF (Or p' q'))
+                            (toCNF (Or p' r'))
+    where p' = toNNF p
+          q' = toNNF q
+          r' = toNNF r
+  toCNF (Or (And p q) r)  = And
+                            (toCNF (Or r' p'))
+                            (toCNF (Or r' q'))
+    where p' = toNNF p
+          q' = toNNF q
+          r' = toNNF r
+  toCNF (Or p q)          = Or (toCNF $ toNNF p) (toCNF $ toNNF q)
 
   -- |’toDNF’ @f@ converts the formula @f@ to DNF.
   -- toDNF :: Fml a -> Fml a
