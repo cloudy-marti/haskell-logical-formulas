@@ -163,7 +163,14 @@ Fml (..)
   isNNF _         = False
 
   -- |’isCNF’ @f@ returns true if formula @f@ is CNF.
-  -- isCNF :: Fml a -> Bool
+  isCNF :: Fml a -> Bool
+  isCNF (Not p)                   = isCNF p
+  isCNF (And (Final _) (Final _)) = False
+  isCNF (And p q)                 = isCNF p && isCNF q
+  isCNF (Or (Final _) (Final _))  = True
+  isCNF (Or _ _)                  = False
+  isCNF (Final _)                 = True
+  isCNF _                         = False
 
   -- |’isDNF’ @f@ returns true if formula @f@ is DNF.
   -- isDNF :: Fml a -> Bool
