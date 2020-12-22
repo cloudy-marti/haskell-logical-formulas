@@ -173,7 +173,13 @@ Fml (..)
   isCNF _                         = False
 
   -- |’isDNF’ @f@ returns true if formula @f@ is DNF.
-  -- isDNF :: Fml a -> Bool
+  isDNF :: Fml a -> Bool
+  isDNF (Not p)                   = isCNF p
+  isDNF (Or (Final _) (Final _))  = False
+  isDNF (Or p q)                  = isDNF p && isDNF q
+  isDNF (And (Final _) (Final _)) = True
+  isDNF (And _ _)                 = False
+  isDNF _                         = False
 
   -- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
   -- to formula @p@.
