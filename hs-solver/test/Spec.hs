@@ -56,7 +56,58 @@ testFmlMaxDephFormula :: Test
 testFmlMaxDephFormula = 
     TestCase $ assertEqual "Should return 2, the max depht of a formula" 2 (Fml.depth c)
                            where 
-                               c = Fml.Or vx $ Fml.Not vy                       
+                               c = Fml.Or vx $ Fml.Not vy   
+
+-------------------------------------------- toNNF TEST ------------------------------------------------------- 
+testConvertImplyFormulaToNNF :: Test
+testConvertImplyFormulaToNNF = 
+    TestCase $ assertEqual "A => B formula should return !A V B" (Fml.Or (Fml.Not va) vb) (Fml.toNNF c)
+                           where 
+                               c = Fml.Imply va vb  
+
+testConvertNotImplyFormulaToNNF :: Test
+testConvertNotImplyFormulaToNNF = 
+    TestCase $ assertEqual "!(A -> B) formula should return A ∧ !B" (Fml.And va (Fml.Not vb)) (Fml.toNNF c)
+                           where 
+                               c = Fml.Not $ Fml.Imply va vb
+
+testConvertNOrFormulaToNNF :: Test
+testConvertNOrFormulaToNNF = 
+    TestCase $ assertEqual "!(A ∨ B) formula should return !A ∧ !B " (Fml.And (Fml.Not va) (Fml.Not vb)) (Fml.toNNF c)
+                           where 
+                               c = Fml.NOr va vb
+
+testConvertNAndFormulaToNNF :: Test
+testConvertNAndFormulaToNNF = 
+    TestCase $ assertEqual "!(A ∧ B) formula should return !A ∨ !B " (Fml.Or (Fml.Not va) (Fml.Not vb)) (Fml.toNNF c)
+                           where 
+                               c = Fml.NAnd va vb
+
+testConvertNotNotFormulaToNNF :: Test
+testConvertNotNotFormulaToNNF = 
+    TestCase $ assertEqual "!!A formula should return A" va (Fml.toNNF c)
+                           where 
+                               c = Fml.Not $ Fml.Not va                                
+
+testConvertEqFormulaToNNF :: Test
+testConvertEqFormulaToNNF = 
+    TestCase $ assertEqual "A <--> B should return (!A V B) ∧ (A V !B) " (Fml.And (Fml.Or (Fml.Not va) vb) (Fml.Or (Fml.Not vb) va)) (Fml.toNNF c)
+                           where 
+                               c = Fml.Equiv va vb 
+
+testConvertComplexFormulaToNNF :: Test
+testConvertComplexFormulaToNNF = 
+    TestCase $ assertEqual "!(!A ∨ B) ∨ (X -> !Y) should return (A ∧ !B) ∨ (!X ∨ !Y)" (Fml.Or (Fml.And va (Fml.Not vb)) (Fml.Or (Fml.Not vx) (Fml.Not vy)))  (Fml.toNNF c)
+                           where 
+                               c = Fml.Or (Fml.Not (Fml.Or (Fml.Not va) vb)) (Fml.Imply vx (Fml.Not vy))
+
+
+testConvertComplexFormulaToNNF2 :: Test
+testConvertComplexFormulaToNNF2 = 
+    TestCase $ assertEqual "(!A -> B) -> (B -> !X) should return (!A ∧ !B) ∨ (!B ∨ !X)" (Fml.Or (Fml.And (Fml.Not va) (Fml.Not vb)) (Fml.Or (Fml.Not vb) (Fml.Not vx))) (Fml.toNNF c)
+                           where 
+                               c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx))
+
 
 ---------------------------------------------- MAIN -----------------------------------------------------------
 main :: IO ()
@@ -65,6 +116,10 @@ main = do
     runTestTT $ TestList [testFmlGetVarFromFormula, testFmlGetVarFromFormula2,                                  -- vars
                           testFmlUniqueVarsFromFormula, testFmlGetAllVarsFromFormula,                             
                           testFmlDephOfFormula, testFmlDephNotfFormula, testFmlDephNotNotOfFormula,             -- depth
-                          testFmlMaxDephFormula
+                          testFmlMaxDephFormula,
+                          testConvertImplyFormulaToNNF, testConvertEqFormulaToNNF,                              -- toNNF
+                          testConvertNOrFormulaToNNF, testConvertNAndFormulaToNNF,
+                          testConvertNotNotFormulaToNNF, testConvertNotImplyFormulaToNNF, 
+                          testConvertComplexFormulaToNNF, testConvertComplexFormulaToNNF2
                           ]
     return()    
