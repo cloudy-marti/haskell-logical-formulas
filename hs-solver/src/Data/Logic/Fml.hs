@@ -159,7 +159,7 @@ Fml (..)
   isNNF (Not p)   = isNNF p
   isNNF (Or p q)  = isNNF p && isNNF q
   isNNF (And p q) = isNNF p && isNNF q
-  isNNF (Final p) = True
+  isNNF (Final _) = True
   isNNF _         = False
 
   -- |’isCNF’ @f@ returns true if formula @f@ is CNF.
