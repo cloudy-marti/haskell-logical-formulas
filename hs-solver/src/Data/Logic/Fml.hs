@@ -179,6 +179,7 @@ Fml (..)
   isDNF (Or p q)                  = isDNF p && isDNF q
   isDNF (And (Final _) (Final _)) = True
   isDNF (And _ _)                 = False
+  isDNF (Final _)                 = True
   isDNF _                         = False
 
   -- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
