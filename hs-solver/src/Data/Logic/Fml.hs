@@ -208,7 +208,10 @@ Fml (..)
 
   -- |’isUniversalNAnd’ @p@ returns true iff formula @p@ uses only NAND
   -- and variables.
-  -- isUniversalNAnd :: Fml a -> Bool
+  isUniversalNAnd :: Fml a -> Bool
+  isUniversalNAnd (Final _)   = True
+  isUniversalNAnd (NAnd p q)  = isUniversalNAnd p && isUniversalNAnd q
+  isUniversalNAnd _           = False
 
   -- |’isUniversalNOr’ @p@ returns true iff formula @p@ uses only NOR
   -- and variables.
