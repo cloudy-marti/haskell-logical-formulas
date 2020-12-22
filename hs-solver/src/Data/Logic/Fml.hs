@@ -196,7 +196,15 @@ Fml (..)
 
   -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
   -- to formula @p@.
-  -- toUniversalNOr :: Fml a -> Fml a
+  toUniversalNOr :: Fml a -> Fml a
+  toUniversalNOr (Final p)  = Final p
+  toUniversalNOr (Not p)    = NOr (toUniversalNOr p) (toUniversalNOr p)
+  toUniversalNOr (Or p q)   = NOr
+                              (NOr (toUniversalNOr p) (toUniversalNAnd q))
+                              (NOr (toUniversalNOr p) (toUniversalNAnd q))
+  toUniversalNOr (And p q)  = NOr
+                              (NOr (toUniversalNOr p) (toUniversalNAnd p))
+                              (NOr (toUniversalNOr q) (toUniversalNAnd q))
 
   -- |’isUniversalNAnd’ @p@ returns true iff formula @p@ uses only NAND
   -- and variables.
