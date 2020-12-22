@@ -136,7 +136,23 @@ Fml (..)
   toCNF (Or p q)          = Or (toCNF $ toNNF p) (toCNF $ toNNF q)
 
   -- |’toDNF’ @f@ converts the formula @f@ to DNF.
-  -- toDNF :: Fml a -> Fml a
+  toDNF :: Fml a -> Fml a
+  toDNF (Final p)         = Final p
+  toDNF (Not p)           = Not p
+  toDNF (Or p q)          = Or (toDNF $ toNNF p) (toDNF $ toNNF q)
+  toDNF (And p (Or q r))  = Or
+                            (toDNF (And p' q'))
+                            (toDNF (And p' r'))
+    where p' = toNNF p
+          q' = toNNF q
+          r' = toNNF r
+  toDNF (And (Or p q) r)  = Or
+                            (toDNF (And r' p'))
+                            (toDNF (And r' q'))
+    where p' = toNNF p
+          q' = toNNF q
+          r' = toNNF r
+  toDNF (And p q)         = Or (toDNF $ toNNF p) (toDNF $ toNNF q)
 
   -- |’isNNF’ @f@ returns true if formula @f@ is NNF.
   -- isNNF :: Fml a -> Bool
