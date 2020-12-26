@@ -8,7 +8,7 @@ Fml (..)
 , prettyFormat
 -- * Transforming
 , toNNF
--- , toCNF
+, toCNF
 -- , toCCNF
 -- , toDNF
 -- , toUniversalNAnd
@@ -118,22 +118,17 @@ Fml (..)
 
   -- |’toCNF’ @f@ converts the formula @f@ to CNF.
   toCNF :: Fml a -> Fml a
-  toCNF (Final p)         = Final p   
-  toCNF (Not p)           = Not p
-  toCNF (And p q)         = And (toCNF $ toNNF p) (toCNF $ toNNF q)
-  toCNF (Or p (And q r))  = And
-                            (toCNF (Or p' q'))
-                            (toCNF (Or p' r'))
-    where p' = toNNF p
-          q' = toNNF q
-          r' = toNNF r
-  toCNF (Or (And p q) r)  = And
-                            (toCNF (Or r' p'))
-                            (toCNF (Or r' q'))
-    where p' = toNNF p
-          q' = toNNF q
-          r' = toNNF r
-  toCNF (Or p q)          = Or (toCNF $ toNNF p) (toCNF $ toNNF q)
+  toCNF = toCNF' . toNNF
+      where 
+            toCNF' :: Fml a -> Fml a
+            toCNF' fml = case fml of
+                  Or a (And b c) -> And (toCNF' (Or a b)) (toCNF' (Or a c))
+                  Or (And a b) c -> And (toCNF' (Or a c)) (toCNF' (Or b c))
+                  Or a b         -> Or  (toCNF' a) (toCNF' b)
+                  And a b        -> And (toCNF' a) (toCNF' b)
+                  Not a          -> Not a
+                  Final a        -> Final a
+
 
   -- |’toDNF’ @f@ converts the formula @f@ to DNF.
   toDNF :: Fml a -> Fml a
@@ -143,7 +138,8 @@ Fml (..)
   toDNF (And p (Or q r))  = Or
                             (toDNF (And p' q'))
                             (toDNF (And p' r'))
-    where p' = toNNF p
+    where 
+          p' = toNNF p
           q' = toNNF q
           r' = toNNF r
   toDNF (And (Or p q) r)  = Or
