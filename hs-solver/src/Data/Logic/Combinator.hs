@@ -1,8 +1,8 @@
 module Data.Logic.Combinator (
 -- * Type
 -- * Utils
--- , multOr
--- , multAnd
+  multOr
+, multAnd
 -- , allOf
 -- , noneOf
 -- , atLeast
@@ -22,7 +22,10 @@ module Data.Logic.Combinator (
     -- Nothing
     -- >>> multOr [Fml.Final (Var.mk i) | i <- [1..4]]
     -- Just (Or (Final 1) (Or (Final 2) (Or (Final 3) (Final 4))))
-    -- multOr :: [Fml.Fml a] -> Maybe (Fml.Fml a)
+    multOr :: [Fml.Fml a] -> Maybe (Fml.Fml a)
+    multOr []       = Nothing
+    multOr [p]      = Just p
+    multOr (p:qs)   = Just $ foldr Fml.Or p qs
 
     -- |’multAnd’ @fs@ returns the conjunction of the formulas in @fs.
     -- It returns @Nothing@ if @fs@ is the empty list.
@@ -31,15 +34,24 @@ module Data.Logic.Combinator (
     -- Nothing
     -- multAnd [Fml.Final (Var.mk i) | i <- [1..4]]
     -- Just (And (Final 1) (And (Final 2) (And (Final 3) (Final 4))))
-    -- multAnd :: [Fml.Fml a] -> Maybe (Fml.Fml a)
+    multAnd :: [Fml.Fml a] -> Maybe (Fml.Fml a)
+    multAnd []      = Nothing
+    multAnd [p]     = Just p
+    multAnd (p:qs)  = Just $ foldr Fml.And p qs
 
     -- |’allOf’ @vs@ returns a formula that is satisfiable iff all variables
     -- in @vs@ are true. The function returns @Nothing@ if @vs@ is the empty list.
-    -- allOf :: [Var.Var a] -> Maybe (Fml.Fml a)
+    allOf :: [Var.Var a] -> Maybe (Fml.Fml a)
+    allOf []        = Nothing
+    allOf [p]       = Just $ Fml.Final p
+    allOf (p:qs)    = Just $ foldr Fml.And (Fml.Final p) (allOf qs)
 
     -- |’noneOf’ @vs@ returns a formula that is satisfiable iff no variable
     -- in @vs@ is true. The function returns @Nothing@ if @vs@ is the empty list.
-    -- noneOf :: [Var.Var a] -> Maybe (Fml.Fml a)
+    noneOf :: [Var.Var a] -> Maybe (Fml.Fml a)
+    noneOf []       = Nothing 
+    noneOf [p]      = Just $ Fml.Not $ Fml.Final p
+    noneOf (p:qs)   = Just $ foldr Fml.And (Fml.Not $ Fml.Final p) (noneOf qs)
 
     -- |’atLeast’ @vs@ @k@ returns a formula that is satisfied iff at least @k@
     -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
