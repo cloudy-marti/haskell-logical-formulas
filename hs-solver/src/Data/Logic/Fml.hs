@@ -11,12 +11,12 @@ Fml (..)
 , toCNF
 -- , toCCNF
 , toDNF
--- , toUniversalNAnd
+, toUniversalNAnd
 -- * Testing
--- , isNNF
--- , isCNF
+, isNNF
+, isCNF
 -- , isCCNF
--- , isDNF
+, isDNF
 ) where
   import qualified Data.Logic.Var as Var
   import qualified Data.List      as L
@@ -122,12 +122,12 @@ Fml (..)
       where 
             toCNF' :: Fml a -> Fml a
             toCNF' fml = case fml of
-                  Or a (And b c) -> And (toCNF' (Or a b)) (toCNF' (Or a c))
-                  Or (And a b) c -> And (toCNF' (Or a c)) (toCNF' (Or b c))
-                  Or a b         -> Or  (toCNF' a) (toCNF' b)
-                  And a b        -> And (toCNF' a) (toCNF' b)
-                  Not a          -> Not a
-                  Final a        -> Final a
+                  Or p (And q r) -> And (toCNF' (Or p q)) (toCNF' (Or p r))
+                  Or (And p q) r -> And (toCNF' (Or p r)) (toCNF' (Or q r))
+                  Or p q         -> Or  (toCNF' p) (toCNF' q)
+                  And p q        -> And (toCNF' p) (toCNF' q)
+                  Not p          -> Not p
+                  Final p        -> Final p
 
 
   -- |’toDNF’ @f@ converts the formula @f@ to DNF.
@@ -136,12 +136,12 @@ Fml (..)
       where 
             toDNF' :: Fml a -> Fml a
             toDNF' fml = case fml of
-                  And a (Or b c) -> Or (toDNF' (And a b)) (toDNF' (And a c))
-                  And (Or a b) c -> Or (toDNF' (And a c)) (toDNF' (And b c))
-                  Or a b         -> Or  (toDNF' a) (toDNF' b)
-                  And a b        -> And (toDNF' a) (toDNF' b)
-                  Not a          -> Not a
-                  Final a        -> Final a
+                  And p (Or q r) -> Or (toDNF' (And p q)) (toDNF' (And p r))
+                  And (Or p q) r -> Or (toDNF' (And p r)) (toDNF' (And q r))
+                  Or p q         -> Or  (toDNF' p) (toDNF' q)
+                  And p q        -> And (toDNF' p) (toDNF' q)
+                  Not p          -> Not p
+                  Final p        -> Final p
 
   -- |’isNNF’ @f@ returns true if formula @f@ is NNF.
   isNNF :: Fml a -> Bool
