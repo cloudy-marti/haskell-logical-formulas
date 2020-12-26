@@ -10,7 +10,7 @@ Fml (..)
 , toNNF
 , toCNF
 -- , toCCNF
--- , toDNF
+, toDNF
 -- , toUniversalNAnd
 -- * Testing
 -- , isNNF
@@ -132,23 +132,16 @@ Fml (..)
 
   -- |’toDNF’ @f@ converts the formula @f@ to DNF.
   toDNF :: Fml a -> Fml a
-  toDNF (Final p)         = Final p
-  toDNF (Not p)           = Not p
-  toDNF (Or p q)          = Or (toDNF $ toNNF p) (toDNF $ toNNF q)
-  toDNF (And p (Or q r))  = Or
-                            (toDNF (And p' q'))
-                            (toDNF (And p' r'))
-    where 
-          p' = toNNF p
-          q' = toNNF q
-          r' = toNNF r
-  toDNF (And (Or p q) r)  = Or
-                            (toDNF (And r' p'))
-                            (toDNF (And r' q'))
-    where p' = toNNF p
-          q' = toNNF q
-          r' = toNNF r
-  toDNF (And p q)         = Or (toDNF $ toNNF p) (toDNF $ toNNF q)
+  toDNF = toDNF' . toNNF
+      where 
+            toDNF' :: Fml a -> Fml a
+            toDNF' fml = case fml of
+                  And a (Or b c) -> Or (toDNF' (And a b)) (toDNF' (And a c))
+                  And (Or a b) c -> Or (toDNF' (And a c)) (toDNF' (And b c))
+                  Or a b         -> Or  (toDNF' a) (toDNF' b)
+                  And a b        -> And (toDNF' a) (toDNF' b)
+                  Not a          -> Not a
+                  Final a        -> Final a
 
   -- |’isNNF’ @f@ returns true if formula @f@ is NNF.
   isNNF :: Fml a -> Bool

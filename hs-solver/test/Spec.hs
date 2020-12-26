@@ -120,7 +120,7 @@ testConvertImplyFormulaToCNF2 =
     TestCase $ assertEqual "(A ∧ B) -> X should return (!A ∨ !B) ∨ X " (Fml.Or (Fml.Or (Fml.Not va) (Fml.Not vb)) vx) (Fml.toCNF c)
                            where 
                                c = Fml.Imply (Fml.And va vb) vx
-                               
+
 testConvertFormulaToCNF:: Test
 testConvertFormulaToCNF = 
     TestCase $ assertEqual "!(A ∨ (A -> B)) should return A ∧ (A ∧ !B) " (Fml.And (Fml.Not va) (Fml.And va (Fml.Not vb))) (Fml.toCNF c)
@@ -140,7 +140,16 @@ testConvertComplexFormulaToCNF2 =
                            where 
                                c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx))
 
+-------------------------------------------- toDNF TEST ------------------------------------------------------- 
 
+testDNF :: Test
+testDNF = 
+    TestCase $ assertEqual "TODO should return TODO" (Fml.And (Fml.Or (Fml.Not va) $ Fml.Or (Fml.Not vb) (Fml.Not vx)) (Fml.Or (Fml.Not vb) (Fml.Not vx))) (Fml.toDNF c)
+                           where 
+                               c = Fml.Or (Fml.Imply va (Fml.And vb vx)) (Fml.Not (Fml.Or va (Fml.Not (Fml.Or vx vy))))                            
+
+-- Or (Or (Not (Final "a")) (And (Final "b") (Final "x"))) (Or (And (Not (Final "a")) (Final "x")) (And (Not (Final "a")) (Final "y")))
+-- (!A ∨ ( B ∧ X)) ∨ ((!A ∧ X) ∨ (!A ∧ Y)) ==> OKKKK :) TODO
 ---------------------------------------------- MAIN -----------------------------------------------------------
 main :: IO ()
 main = do
@@ -155,6 +164,7 @@ main = do
                           testConvertComplexFormulaToNNF, testConvertComplexFormulaToNNF2,
                           testConvertImplyFormulaToCNF, testConvertImplyFormulaToCNF2,                          -- toCNF
                           testConvertFormulaToCNF,
-                          testConvertComplexFormulaToCNF, testConvertComplexFormulaToCNF2                       
+                          testConvertComplexFormulaToCNF, testConvertComplexFormulaToCNF2,
+                          testDNF                       
                           ]
     return()    
