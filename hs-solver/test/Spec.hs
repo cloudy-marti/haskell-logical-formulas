@@ -142,14 +142,93 @@ testConvertComplexFormulaToCNF2 =
 
 -------------------------------------------- toDNF TEST ------------------------------------------------------- 
 
+-- TODO ADD OTHER TEST
+
 testDNF :: Test
 testDNF = 
-    TestCase $ assertEqual "TODO should return TODO" (Fml.And (Fml.Or (Fml.Not va) $ Fml.Or (Fml.Not vb) (Fml.Not vx)) (Fml.Or (Fml.Not vb) (Fml.Not vx))) (Fml.toDNF c)
+    TestCase $ assertEqual "((A -> (B ∧ X)) ∨ !(A ∨ !(X ∨ Y)) ) should return (!A ∨ ( B ∧ X)) ∨ ((!A ∧ X) ∨ (!A ∧ Y))" (Fml.Or (Fml.Or (Fml.Not va) (Fml.And vb vx)) (Fml.Or (Fml.And (Fml.Not va) vx) (Fml.And (Fml.Not va) vy))) (Fml.toDNF c)
                            where 
-                               c = Fml.Or (Fml.Imply va (Fml.And vb vx)) (Fml.Not (Fml.Or va (Fml.Not (Fml.Or vx vy))))                            
+                               c = Fml.Or (Fml.Imply va (Fml.And vb vx)) (Fml.Not (Fml.Or va (Fml.Not (Fml.Or vx vy))))  
 
--- Or (Or (Not (Final "a")) (And (Final "b") (Final "x"))) (Or (And (Not (Final "a")) (Final "x")) (And (Not (Final "a")) (Final "y")))
--- (!A ∨ ( B ∧ X)) ∨ ((!A ∧ X) ∨ (!A ∧ Y)) ==> OKKKK :) TODO
+-------------------------------------------- isNNF TEST -------------------------------------------------------    
+
+testIsNNF :: Test
+testIsNNF = 
+    TestCase $ assertEqual "A ∧ (B ∨ !X) should return True " True (Fml.isNNF c)
+                           where 
+                               c = Fml.And va (Fml.Or vb (Fml.Not vx))
+
+testIsNNF2 :: Test
+testIsNNF2 = 
+    TestCase $ assertEqual "(A ∧ B) ∨ (A ∧ !X)  should return True " True (Fml.isNNF c)
+                           where 
+                               c = Fml.Or (Fml.And va vb) (Fml.And va (Fml.Not vx))
+
+testIsNNF3 :: Test
+testIsNNF3 = 
+    TestCase $ assertEqual "(A ∨ B) ∧ X  should return True " True (Fml.isNNF c)
+                           where 
+                               c = Fml.And (Fml.Or va vb) vx
+testIsNNF4 :: Test
+testIsNNF4 = 
+    TestCase $ assertEqual "(A ∧ (!B ∨ X) ∧ !X) ∨ Y  should return True " True (Fml.isNNF c)
+                           where 
+                               c = Fml.Or (Fml.And va $ Fml.And (Fml.Or (Fml.Not vb) vx) (Fml.Not vx)) vy
+testIsNNF5 :: Test
+testIsNNF5 = 
+    TestCase $ assertEqual "A ∨ !B  should return True " True (Fml.isNNF c)
+                           where 
+                               c = Fml.Or va (Fml.Not vb)    
+testIsNNF6 :: Test
+testIsNNF6 = 
+    TestCase $ assertEqual "A ∧ !B  should return True " True (Fml.isNNF c)
+                           where 
+                               c = Fml.And va (Fml.Not vb) 
+testIsNNF7 :: Test
+testIsNNF7 = 
+    TestCase $ assertEqual "A -> B  should return False " False (Fml.isNNF c)
+                           where 
+                               c = Fml.Imply va vb
+testIsNNF8 :: Test
+testIsNNF8 = 
+    TestCase $ assertEqual "A <-> B  should return False " False (Fml.isNNF c)
+                           where 
+                               c = Fml.Equiv va vb
+testIsNNF9 :: Test
+testIsNNF9 = 
+    TestCase $ assertEqual "!(A ∧ B)  should return False " False (Fml.isNNF c)
+                           where 
+                               c = Fml.NAnd va vb
+testIsNNF10 :: Test
+testIsNNF10 = 
+    TestCase $ assertEqual "!(A ∨ B)  should return False " False (Fml.isNNF c)
+                           where 
+                               c = Fml.NOr va vb
+testIsNNF11 :: Test
+testIsNNF11 = 
+    TestCase $ assertEqual "!(A ∨ B)  should return False " False (Fml.isNNF c)
+                           where 
+                               c = Fml.NOr va (Fml.Not vb) 
+testIsNNF12 :: Test
+testIsNNF12 = 
+    TestCase $ assertEqual "!(A ∧ B)  should return False " False (Fml.isNNF c)
+                           where 
+                               c = Fml.Not (Fml.And va vb)
+testIsNNF13 :: Test
+testIsNNF13 = 
+    TestCase $ assertEqual "!(A ∨ B)  should return False " False (Fml.isNNF c)
+                           where 
+                               c = Fml.Not (Fml.Or va vb)  
+testIsNNF14 :: Test
+testIsNNF14 = 
+    TestCase $ assertEqual "!A ∧ B  should return True " True (Fml.isNNF c)
+                           where 
+                               c = Fml.And (Fml.Not va) vb
+testIsNNF15 :: Test
+testIsNNF15 = 
+    TestCase $ assertEqual "!A ∨ !B  should return True " True (Fml.isNNF c)
+                           where 
+                               c = Fml.Or (Fml.Not va) (Fml.Not vb)      
 ---------------------------------------------- MAIN -----------------------------------------------------------
 main :: IO ()
 main = do
@@ -165,6 +244,9 @@ main = do
                           testConvertImplyFormulaToCNF, testConvertImplyFormulaToCNF2,                          -- toCNF
                           testConvertFormulaToCNF,
                           testConvertComplexFormulaToCNF, testConvertComplexFormulaToCNF2,
-                          testDNF                       
+                          testDNF,                                                                              -- toDNF (in progress)
+                          testIsNNF, testIsNNF2, testIsNNF3, testIsNNF4, testIsNNF5, testIsNNF6,                -- isNNF                   
+                          testIsNNF7, testIsNNF8, testIsNNF9, testIsNNF10, testIsNNF11, testIsNNF12,
+                          testIsNNF13, testIsNNF14, testIsNNF15
                           ]
     return()    
