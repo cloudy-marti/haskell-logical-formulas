@@ -14,6 +14,7 @@ module Data.Logic.Combinator (
 ) where
     import qualified Data.Logic.Var as Var
     import qualified Data.Logic.Fml as Fml
+    import Data.List
 
     -- |’multOr’ @fs@ returns the disjunction of the formulas in @fs.
     -- It returns @Nothing@ if @fs@ is the empty list.
@@ -52,6 +53,13 @@ module Data.Logic.Combinator (
     noneOf []       = Nothing 
     noneOf [p]      = Just $ Fml.Not $ Fml.Final p
     noneOf (p:qs)   = Just $ foldr Fml.And (Fml.Not $ Fml.Final p) (noneOf qs)
+
+    -- |’getSubListOfSize’ @n@ @lst@ returns a list of sublists of size n where each
+    -- sublist is different (like finding the permutations of size n of a list).
+    getSubListOfSize :: Int -> [a] -> [[a]]
+    getSubListOfSize 0 _  = [[]]
+    getSubListOfSize _ [] = [[]]
+    getSubListOfSize n lst = takeWhile ((==n) . length) $ map (take n) $ tails lst
 
     -- |’atLeast’ @vs@ @k@ returns a formula that is satisfied iff at least @k@
     -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
