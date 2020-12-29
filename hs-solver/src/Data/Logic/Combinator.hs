@@ -56,10 +56,13 @@ module Data.Logic.Combinator (
 
     -- |’getSubListOfSize’ @n@ @lst@ returns a list of sublists of size n where each
     -- sublist is different (like finding the permutations of size n of a list).
-    getSubListOfSize :: Int -> [a] -> [[a]]
-    getSubListOfSize 0 _  = [[]]
-    getSubListOfSize _ [] = [[]]
-    getSubListOfSize n lst = takeWhile ((==n) . length) $ map (take n) $ tails lst
+    getSubListOfSize n lst = nub . map sort $ concatMap permutations $ getSubListOfSize' lst []
+      where
+        getSubListOfSize' [] l = [l | length l == n]
+        getSubListOfSize' (x:xs) l
+          | length l == n = [l]
+          | otherwise     = getSubListOfSize' xs (x:l)
+                            ++ getSubListOfSize' xs l
 
     -- |’atLeast’ @vs@ @k@ returns a formula that is satisfied iff at least @k@
     -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
