@@ -1,3 +1,6 @@
+# Enter the haskell project
+stack -- exec ghci
+
 import qualified Data.Logic.Var as V
 import qualified Data.Logic.Fml as F
 vz = F.Final $ V.mk "z"
