@@ -9,8 +9,8 @@ module Data.Logic.Combinator (
 , atLeastOne
 , atMost
 , atMostOne
--- , exactly
--- , exactlyOne
+, exactly
+, exactlyOne
 , getSubListOfSize
 ) where
     import qualified Data.Logic.Var as Var
@@ -108,9 +108,14 @@ module Data.Logic.Combinator (
     -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
     -- empty list or @k@ is non-positive or @k@ is larger than the number of
     -- variables in @vs@.
-    -- exactly :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
+    exactly :: Ord a => [Var.Var a] -> Int -> Maybe (Fml.Fml a)
+    exactly [] _                  = Nothing 
+    exactly lst k
+      | k <= 0 || k > length lst  = Nothing 
+      | otherwise                 = Just $ Fml.And (fromJust $ atLeast lst k) (fromJust $ atMost lst k)
 
     -- |’exactlyOne’ @vs@ returns a formula that is satisfiable iff exactly one
     -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
     -- empty list.
-    -- exactlyOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+    exactlyOne :: Ord a => [Var.Var a] -> Maybe (Fml.Fml a)
+    exactlyOne lst = exactly lst 1
