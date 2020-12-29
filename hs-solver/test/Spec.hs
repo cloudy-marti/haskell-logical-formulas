@@ -108,6 +108,25 @@ testConvertComplexFormulaToNNF2 =
                            where 
                                c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx))
 
+testConvertComplexFormulaToNNF3 :: Test
+testConvertComplexFormulaToNNF3 = 
+    TestCase $ assertEqual "(A ⊙ B) -> !(C ∨ (A ∧ B)) should return NNF ?????" 
+                                   (Fml.Or 
+                                     (
+                                        Fml.And 
+                                        (Fml.Or va vb)
+                                        (Fml.Or (Fml.Not va) (Fml.Not vb))
+                                     )
+                                     (
+                                         Fml.Or
+                                         (Fml.Not vc)
+                                         (Fml.And (Fml.Not va) (Fml.Not vb))
+                                     )
+                                   )
+                                    (Fml.toNNF c)
+                           where 
+                               c = Fml.Imply (Fml.XNOr va vb) (Fml.NOr vc (Fml.And va vb)) 
+
 -------------------------------------------- toCNF TEST ------------------------------------------------------- 
 testConvertImplyFormulaToCNF :: Test
 testConvertImplyFormulaToCNF = 
@@ -140,8 +159,21 @@ testConvertComplexFormulaToCNF2 =
                            where 
                                c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx))
 
--------------------------------------------- toDNF TEST ------------------------------------------------------- 
+testConvertComplexFormulaToCNF3 :: Test
+testConvertComplexFormulaToCNF3 = 
+    TestCase $ assertEqual "(A ⊙ B) -> !(C ∨ (A ∧ B)) should return ????" 
+                                   (Fml.And 
+                                     (Fml.Or va $ Fml.Or vb $ Fml.Or (Fml.Not vc) (Fml.Not va)) $
+                                    Fml.And
+                                     (Fml.Or va $ Fml.Or vb $ Fml.Or (Fml.Not vc) (Fml.Not vb)) $
+                                    Fml.And 
+                                     (Fml.Or (Fml.Not va) $ Fml.Or (Fml.Not vb) $ Fml.Or (Fml.Not vc) (Fml.Not va)) 
+                                     (Fml.Or (Fml.Not va) $ Fml.Or (Fml.Not vb) $ Fml.Or (Fml.Not vc) (Fml.Not vb))) 
+                                    (Fml.toCNF c)
+                           where 
+                               c = Fml.Imply (Fml.XNOr va vb) (Fml.NOr vc (Fml.And va vb)) 
 
+-------------------------------------------- toDNF TEST ------------------------------------------------------- 
 -- TODO ADD OTHER TEST
 
 testDNF :: Test
@@ -305,9 +337,11 @@ main = do
                           testConvertNOrFormulaToNNF, testConvertNAndFormulaToNNF,
                           testConvertNotNotFormulaToNNF, testConvertNotImplyFormulaToNNF, 
                           testConvertComplexFormulaToNNF, testConvertComplexFormulaToNNF2,
+                          testConvertComplexFormulaToNNF3,
                           testConvertImplyFormulaToCNF, testConvertImplyFormulaToCNF2,                          -- toCNF
                           testConvertFormulaToCNF,
                           testConvertComplexFormulaToCNF, testConvertComplexFormulaToCNF2,
+                          testConvertComplexFormulaToCNF3,
                           testDNF,                                                                              -- toDNF (in progress)
                           testIsNNF, testIsNNF2, testIsNNF3, testIsNNF4, testIsNNF5, testIsNNF6,                -- isNNF                   
                           testIsNNF7, testIsNNF8, testIsNNF9, testIsNNF10, testIsNNF11, testIsNNF12,
@@ -317,3 +351,8 @@ main = do
                           testIsNotCNF6 
                           ]
     return()    
+
+
+    -- E : And (Or (Final "a") (Or (Final "b") (Or (Not (Final "c")) (Not (Final "a"))))) (And (Or (Final "a") (Or (Final "b") (Or (Not (Final "c")) (Not (Final "b"))))) (And (Or (Not (Final "a")) (Or (Not (Final "b")) (Or (Not (Final "c")) (Not (Final "a"))))) (Or (Not (Final "a")) (Or (Not (Final "b")) (Or (Not (Final "c")) (Not (Final "b")))))))
+    -- G : And (Or (Not (Or (And (Final "a") (Final "b")) (And (Not (Final "a")) (Not (Final "b"))))) (Not (Final "c"))) (Or (Not (Or (And (Final "a") (Final "b")) (And (Not (Final "a")) (Not (Final "b"))))) (Or (Not (Final "a")) (Not (Final "b"))))
+    -- m : And (Or (Not (Or (And (Final "a") (Final "b")) (And (Not (Final "a")) (Not (Final "b"))))) (Not (Final "c"))) (Or (Not (Or (And (Final "a") (Final "b")) (And (Not (Final "a")) (Not (Final "b"))))) (Or (Not (Final "a")) (Not (Final "b"))))
