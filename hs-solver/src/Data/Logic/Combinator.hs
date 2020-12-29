@@ -59,24 +59,24 @@ module Data.Logic.Combinator (
     -- |’getSubListOfSize’ @n@ @lst@ returns a list of sublists of size n where each
     -- sublist is different (like finding the permutations of size n of a list).
     getSubListOfSize :: Ord a => Int -> [Var.Var a] -> [[Var.Var a]]
-    getSubListOfSize n lst = nub . map sort $ concatMap permutations $ getSubListOfSize' lst []
+    getSubListOfSize n lst  = nub . map sort $ concatMap permutations $ getSubListOfSize' lst []
       where
         getSubListOfSize' [] l = [l | length l == n]
         getSubListOfSize' (x:xs) l
-          | length l == n = [l]
-          | otherwise     = getSubListOfSize' xs (x:l)
-                            ++ getSubListOfSize' xs l
+          | length l == n   = [l]
+          | otherwise       = getSubListOfSize' xs (x:l)
+                              ++ getSubListOfSize' xs l
 
     -- |’atLeast’ @vs@ @k@ returns a formula that is satisfied iff at least @k@
     -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
     -- empty list or @k@ is non-positive or @k@ is larger than the number of
     -- variables in @vs@.
     atLeast :: Ord a => [Var.Var a] -> Int -> Maybe (Fml.Fml a)
-    atLeast [] _          = Nothing
+    atLeast [] _                  = Nothing
     atLeast lst k
       | k <= 0 || k > length lst  = Nothing
       | k == 1                    = multOr $ map Fml.Final lst
-    atLeast lst k                 = multOr $ map ((fromJust . multAnd) . map Fml.Final) (getSubListOfSize k lst)
+      | otherwise                 = multOr $ map ((fromJust . multAnd) . map Fml.Final) (getSubListOfSize k lst)
 
     -- |’atLeastOne’ @vs@ returns a formula that is satisfiable iff at least one
     -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
@@ -89,14 +89,14 @@ module Data.Logic.Combinator (
     -- empty list or @k@ is non-positive or @k@ is larger than the number of
     -- variables in @vs@.
     atMost :: Ord a => [Var.Var a] -> Int -> Maybe (Fml.Fml a)
-    atMost [] _ = Nothing
+    atMost [] _                   = Nothing
     atMost lst k
       | k <= 0 || k > length lst  = Nothing
       | k == length lst           = multOr $ map (Fml.Not . Fml.Final) lst
-    atMost lst k                  = multOr $ map ((fromJust . multAnd) . map not) (getSubListOfSize (l-k) lst)
-      where
-        l = length lst
-        not = Fml.Not . Fml.Final
+      | otherwise                 = multOr $ map ((fromJust . multAnd) . map not) (getSubListOfSize (l-k) lst)
+          where
+            l = length lst
+            not = Fml.Not . Fml.Final
 
     -- |’atMostOne’ @vs@ returns a formula that is satisfiable iff at most one
     -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
