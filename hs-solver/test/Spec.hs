@@ -256,6 +256,11 @@ testIsCNF5 =
     TestCase $ assertEqual " (A ∨ !B) ∧ ( A ∨ X ∨ Y) ∧ ( !A ∨ !X) should return True " True (Fml.isCNF c)
                            where 
                                c = Fml.And (Fml.Or va (Fml.Not vb)) $ Fml.And (Fml.Or va $ Fml.Or vx vy) (Fml.Or (Fml.Not va) (Fml.Not vx))
+testIsCNF6 :: Test
+testIsCNF6 = 
+    TestCase $ assertEqual " (!A -> B) -> (B -> !X) converted to CNF : (!A ∨ !B ∨ !X) ∧ (!B ∨ !X) should return True " True (Fml.isCNF $ Fml.toCNF c)
+                           where 
+                               c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx))
 testIsNotCNF :: Test
 testIsNotCNF = 
     TestCase $ assertEqual " !(A ∧ B) should return False " False (Fml.isCNF c)
@@ -307,7 +312,7 @@ main = do
                           testIsNNF, testIsNNF2, testIsNNF3, testIsNNF4, testIsNNF5, testIsNNF6,                -- isNNF                   
                           testIsNNF7, testIsNNF8, testIsNNF9, testIsNNF10, testIsNNF11, testIsNNF12,
                           testIsNNF13, testIsNNF14, testIsNNF15,
-                          testIsCNF, testIsCNF2, testIsCNF3, testIsCNF4, testIsCNF5,                            -- isCNF
+                          testIsCNF, testIsCNF2, testIsCNF3, testIsCNF4, testIsCNF5, testIsCNF6,                -- isCNF
                           testIsNotCNF, testIsNotCNF2, testIsNotCNF3, testIsNotCNF4, testIsNotCNF5, 
                           testIsNotCNF6 
                           ]
