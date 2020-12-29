@@ -3,18 +3,20 @@ module Data.Logic.Combinator (
 -- * Utils
   multOr
 , multAnd
--- , allOf
--- , noneOf
--- , atLeast
--- , atLeastOne
--- , atMost
--- , atMostOne
+, allOf
+, noneOf
+, atLeast
+, atLeastOne
+, atMost
+, atMostOne
 -- , exactly
 -- , exactlyOne
+, getSubListOfSize
 ) where
     import qualified Data.Logic.Var as Var
     import qualified Data.Logic.Fml as Fml
-    import Data.List
+    import Data.List ( nub, permutations, sort )
+    import Data.Maybe ( fromJust )
 
     -- |’multOr’ @fs@ returns the disjunction of the formulas in @fs.
     -- It returns @Nothing@ if @fs@ is the empty list.
@@ -56,6 +58,7 @@ module Data.Logic.Combinator (
 
     -- |’getSubListOfSize’ @n@ @lst@ returns a list of sublists of size n where each
     -- sublist is different (like finding the permutations of size n of a list).
+    getSubListOfSize :: Ord a => Int -> [Var.Var a] -> [[Var.Var a]]
     getSubListOfSize n lst = nub . map sort $ concatMap permutations $ getSubListOfSize' lst []
       where
         getSubListOfSize' [] l = [l | length l == n]
@@ -68,12 +71,19 @@ module Data.Logic.Combinator (
     -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
     -- empty list or @k@ is non-positive or @k@ is larger than the number of
     -- variables in @vs@.
-    -- atLeast :: [Var.Var a] -> Int -> Maybe (Fml.Fml a)
+    atLeast :: Ord a => [Var.Var a] -> Int -> Maybe (Fml.Fml a)
+    atLeast [] _          = Nothing
+    atLeast lst k
+      | k <= 0            = Nothing
+      | k > length lst    = Nothing
+      | k == 1            = multOr $ map Fml.Final lst
+    atLeast lst k         = multOr $ map ((fromJust . multAnd) . map Fml.Final) (getSubListOfSize k lst)
 
     -- |’atLeastOne’ @vs@ returns a formula that is satisfiable iff at least one
     -- variable in @vs@ is true. The function returns @Nothing@ if @vs@ is the
     -- empty list.
-    -- atLeastOne :: [Var.Var a] -> Maybe (Fml.Fml a)
+    atLeastOne :: Ord a => [Var.Var a] -> Maybe (Fml.Fml a)
+    atLeastOne lst = atLeast lst 1
 
     -- |’atMost’ @vs@ @k@ returns a formula that is satisfiable iff at most @k@
     -- variables in @vs@ are true. The function returns @Nothing@ if @vs@ is the
