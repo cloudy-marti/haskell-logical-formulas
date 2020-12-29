@@ -28,7 +28,7 @@ module Data.Logic.Combinator (
     multOr :: [Fml.Fml a] -> Maybe (Fml.Fml a)
     multOr []       = Nothing
     multOr [p]      = Just p
-    multOr (p:qs)   = Just $ foldr Fml.Or p qs
+    multOr lst      = Just $ foldr1 Fml.Or lst
 
     -- |’multAnd’ @fs@ returns the conjunction of the formulas in @fs.
     -- It returns @Nothing@ if @fs@ is the empty list.
@@ -40,21 +40,21 @@ module Data.Logic.Combinator (
     multAnd :: [Fml.Fml a] -> Maybe (Fml.Fml a)
     multAnd []      = Nothing
     multAnd [p]     = Just p
-    multAnd (p:qs)  = Just $ foldr Fml.And p qs
+    multAnd lst     = Just $ foldr1 Fml.And lst
 
     -- |’allOf’ @vs@ returns a formula that is satisfiable iff all variables
     -- in @vs@ are true. The function returns @Nothing@ if @vs@ is the empty list.
     allOf :: [Var.Var a] -> Maybe (Fml.Fml a)
-    allOf []        = Nothing
-    allOf [p]       = Just $ Fml.Final p
-    allOf (p:qs)    = Just $ foldr Fml.And (Fml.Final p) (allOf qs)
+    allOf []     = Nothing
+    allOf [p]    = Just $ Fml.Final p
+    allOf lst    = Just $ foldr1 Fml.And $ map Fml.Final lst
 
     -- |’noneOf’ @vs@ returns a formula that is satisfiable iff no variable
     -- in @vs@ is true. The function returns @Nothing@ if @vs@ is the empty list.
     noneOf :: [Var.Var a] -> Maybe (Fml.Fml a)
-    noneOf []       = Nothing 
-    noneOf [p]      = Just $ Fml.Not $ Fml.Final p
-    noneOf (p:qs)   = Just $ foldr Fml.And (Fml.Not $ Fml.Final p) (noneOf qs)
+    noneOf []    = Nothing 
+    noneOf [p]   = Just $ Fml.Not $ Fml.Final p
+    noneOf lst   = Just $ foldr1 Fml.And $ map (Fml.Not . Fml.Final)  lst
 
     -- |’getSubListOfSize’ @n@ @lst@ returns a list of sublists of size n where each
     -- sublist is different (like finding the permutations of size n of a list).
