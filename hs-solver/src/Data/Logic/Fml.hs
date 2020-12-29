@@ -95,24 +95,21 @@ Fml (..)
   
   -- |’toNNF’ @f@ converts the formula @f@ to NNF.
   toNNF :: Fml a -> Fml a
-  toNNF (And p q)         = And (toNNF p) (toNNF q)
-  toNNF (Or p q)          = Or  (toNNF p) (toNNF q)
-  
-  toNNF (Equiv p q)       = And (toNNF (Imply p q)) (toNNF (Imply q p))
-  toNNF (Not(Equiv p q))  = Or  (And (toNNF p) (toNNF (Not q))) (And (toNNF (Not p)) (toNNF q))
-
-  toNNF (Imply p q)       = Or  (toNNF (Not p)) (toNNF q)
-  toNNF (Not(Imply p q))  = And  (toNNF p) (toNNF (Not q))
-
-  toNNF (XOr p q)         = And (Or  (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
-  toNNF (XNOr p q)        = Or  (And (toNNF p) (toNNF q)) (And (toNNF (Not p)) (toNNF (Not q)))
-
-  toNNF (NAnd p q)        = Or  (toNNF (Not p)) (toNNF (Not q))
-  toNNF (NOr p q)         = And (toNNF (Not p)) (toNNF (Not q))
+  toNNF (Not (Not p))     = toNNF p
   toNNF (Not (Or p q))    = toNNF (NOr p q)
   toNNF (Not (And p q))   = toNNF (NAnd p q)
+  toNNF (NAnd p q)        = Or  (toNNF (Not p)) (toNNF (Not q))
+  toNNF (NOr p q)         = And (toNNF (Not p)) (toNNF (Not q))
+  toNNF (Not(Equiv p q))  = Or  (And (toNNF p) (toNNF (Not q))) (And (toNNF (Not p)) (toNNF q))
+  toNNF (Not(Imply p q))  = And  (toNNF p) (toNNF (Not q))
 
-  toNNF (Not (Not p))     = toNNF p
+  toNNF (And p q)         = And (toNNF p) (toNNF q)
+  toNNF (Or p q)          = Or  (toNNF p) (toNNF q)
+  toNNF (Equiv p q)       = And (toNNF (Imply p q)) (toNNF (Imply q p))
+  toNNF (Imply p q)       = Or  (toNNF (Not p)) (toNNF q)
+  toNNF (XOr p q)         = And (Or  (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
+  -- toNNF (XNOr p q)        = Or  (And (toNNF p) (toNNF q)) (And (toNNF (Not p)) (toNNF (Not q)))
+  toNNF (XNOr p q)        = And  (Or (toNNF (Not p)) (toNNF q)) (Or (toNNF p) (toNNF (Not q)))
   toNNF (Not p)           = Not (toNNF p)
   toNNF (Final p)         = Final p
 
