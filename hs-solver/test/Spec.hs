@@ -1,6 +1,8 @@
 import Test.HUnit
 import qualified Data.Logic.Var as Var
 import qualified Data.Logic.Fml as Fml
+import qualified Data.Logic.Combinator as Comb
+import Data.Maybe (fromJust)
 
 va = Fml.Final $ Var.mk "a"
 vb = Fml.Final $ Var.mk "b"
@@ -325,6 +327,306 @@ testIsNotCNF6 =
                            where 
                                c = Fml.And va (Fml.Or vb (Fml.And vx vy))
 
+---------------------------------------- Combinator TESTS ------------------------------------------------------- 
+----------------------------------------- var declaration ---------------------------------------------------- 
+
+v1 = Fml.Final $ Var.mk 1
+v2 = Fml.Final $ Var.mk 2
+v3 = Fml.Final $ Var.mk 3
+v4 = Fml.Final $ Var.mk 4
+
+-------------------------------------------- multOr TEST ------------------------------------------------------- 
+testMultOrWithEmptyList :: Test
+testMultOrWithEmptyList =
+    TestCase $ assertEqual " An empty list should return Nothing "
+        Nothing
+        (Comb.multOr $ map Fml.Final ([] :: [Var.Var Int]))
+
+testMultOr :: Test
+testMultOr =
+    TestCase $ assertEqual " A list from 1 to 4 should return Just (Or (Final 1) (Or (Final 2) (Or (Final 3) (Final 4)))) "
+    (Just (Fml.Or v1 (Fml.Or v2 (Fml.Or v3 v4))))
+    (Comb.multOr $ map Fml.Final [Var.mk i | i <- [1..4]])
+
+-------------------------------------------- multAnd TEST ------------------------------------------------------- 
+testMultAndWithEmptyList :: Test
+testMultAndWithEmptyList =
+    TestCase $ assertEqual " An empty list should return Nothing "
+        Nothing
+        (Comb.multAnd $ map Fml.Final ([] :: [Var.Var Int]))
+
+testMultAnd :: Test
+testMultAnd =
+    TestCase $ assertEqual " A list from 1 to 4 should return Just (And (Final 1) (And (Final 2) (And (Final 3) (Final 4)))) "
+    (Just (Fml.And v1 (Fml.And v2 (Fml.And v3 v4))))
+    (Comb.multAnd $ map Fml.Final [Var.mk i | i <- [1..4]])
+
+-------------------------------------------- allOf TEST ------------------------------------------------------- 
+testAllOfWithEmptyList :: Test
+testAllOfWithEmptyList =
+    TestCase $ assertEqual " An empty list should return Nothing "
+        Nothing
+        (Comb.allOf ([] :: [Var.Var Int]))
+
+testAllOf :: Test
+testAllOf =
+    TestCase $ assertEqual " A list from 1 to 4 should return Just (1 . (2 . (3 . 4))) "
+        (Just (Fml.And v1 (Fml.And v2 (Fml.And v3 v4))))
+        (Comb.allOf [Var.mk i | i <- [1..4]])
+
+-------------------------------------------- noneOf TEST ------------------------------------------------------- 
+testNoneOfWithEmptyList :: Test
+testNoneOfWithEmptyList =
+    TestCase $ assertEqual " An empty list should return Nothing "
+        Nothing
+        (Comb.noneOf ([] :: [Var.Var Int]))
+
+testNoneOf :: Test
+testNoneOf =
+    TestCase $ assertEqual " A list from 1 to 4 should return Just (-1 . (-2 . (-3 . -4))) "
+        (Just (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.And (Fml.Not v3) (Fml.Not v4)))))
+        (Comb.noneOf [Var.mk i | i <- [1..4]])
+
+-------------------------------------------- atLeast TEST ------------------------------------------------------- 
+testAtLeastWithEmptyList :: Test
+testAtLeastWithEmptyList =
+    TestCase $ assertEqual " An empty list with any size should return Nothing "
+        Nothing
+        (Comb.atLeast ([] :: [Var.Var Int]) 42)
+
+testAtLeastWithZero :: Test
+testAtLeastWithZero =
+    TestCase $ assertEqual " A list from 1 to 4 with size 0 should return Nothing "
+        Nothing
+        (Comb.atLeast [Var.mk i | i <- [1..4]] 0)
+
+testAtLeastWithANegativeSize :: Test
+testAtLeastWithANegativeSize =
+    TestCase $ assertEqual " An negative size should return Nothing "
+        Nothing
+        (Comb.atLeast [Var.mk i | i <- [1..4]] (-1))
+
+testAtLeastWithATooBigSize :: Test
+testAtLeastWithATooBigSize =
+    TestCase $ assertEqual " A size higher than the length of the list should return Nothing"
+        Nothing
+        (Comb.atLeast [Var.mk i | i <- [1..4]] 42)
+
+testAtLeastWithOne :: Test
+testAtLeastWithOne =
+    TestCase $ assertEqual " A list from 1 to 4 with size 1 should return Just (1 + (2 + (3 + 4))) "
+        (Just (Fml.Or v1 (Fml.Or v2 (Fml.Or v3 v4))))
+        (Comb.atLeast [Var.mk i | i <- [1..4]] 1)
+
+testAtLeastWithTwo :: Test
+testAtLeastWithTwo =
+    TestCase $ assertEqual " A list from 1 to 4 with size 2 should return Just ((1 . 2) + ((1 . 3) + ((1 . 4) + ((2 . 3) + ((2 . 4) + (3 . 4)))))) "
+        (Just (Fml.Or (Fml.And v1 v2) (Fml.Or (Fml.And v1 v3) (Fml.Or (Fml.And v1 v4) (Fml.Or (Fml.And v2 v3) (Fml.Or (Fml.And v2 v4) (Fml.And v3 v4)))))))
+        (Comb.atLeast [Var.mk i | i <- [1..4]] 2)
+
+testAtLeastOne :: Test
+testAtLeastOne =
+    TestCase $ assertEqual " A list from 1 to 4 should return Just (1 + (2 + (3 + 4))) "
+        (Just (Fml.Or v1 (Fml.Or v2 (Fml.Or v3 v4))))
+        (Comb.atLeastOne [Var.mk i | i <- [1..4]])
+
+-------------------------------------------- atMost TEST ------------------------------------------------------- 
+
+testAtMostWithEmptyList :: Test
+testAtMostWithEmptyList =
+    TestCase $ assertEqual " An empty list with any size should return Nothing "
+        Nothing
+        (Comb.atMost ([] :: [Var.Var Int]) 42)
+
+testAtMostWithZero :: Test
+testAtMostWithZero =
+    TestCase $ assertEqual " A list from 1 to 4 with size 0 should return Nothing "
+        Nothing
+        (Comb.atMost [Var.mk i | i <- [1..4]] 0)
+
+testAtMostWithANegativeSize :: Test
+testAtMostWithANegativeSize =
+    TestCase $ assertEqual " An negative size should return Nothing "
+        Nothing
+        (Comb.atMost [Var.mk i | i <- [1..4]] (-1))
+
+testAtMostWithATooBigSize :: Test
+testAtMostWithATooBigSize =
+    TestCase $ assertEqual " A size higher than the length of the list should return Nothing"
+        Nothing
+        (Comb.atMost [Var.mk i | i <- [1..4]] 42)
+
+testAtMostWithOne :: Test
+testAtMostWithOne =
+    TestCase $ assertEqual " A list from 1 to 4 with size 1 should return Just ((-1 . (-2 . -3)) + ((-1 . (-2 . -4)) + ((-1 . (-3 . -4)) + (-2 . (-3 . -4))))) "
+    (Just
+        (Fml.Or
+            (Fml.And (Fml.Not v1)
+                (Fml.And (Fml.Not v2) (Fml.Not v3)))
+            (Fml.Or
+                (Fml.And (Fml.Not v1)
+                    (Fml.And (Fml.Not v2) (Fml.Not v4)))
+                (Fml.Or
+                    (Fml.And (Fml.Not v1)
+                        (Fml.And (Fml.Not v3) (Fml.Not v4)))
+                    (Fml.And (Fml.Not v2)
+                        (Fml.And (Fml.Not v3) (Fml.Not v4))
+                    )
+                )
+            )
+        )
+    )
+    (Comb.atMost [Var.mk i | i <- [1..4]] 1)
+
+testAtMostWithTwo :: Test
+testAtMostWithTwo =
+    TestCase $ assertEqual " A list from 1 to 4 with size 2 should return Just ((-1 . -2) + ((-1 . -3) + ((-1 . -4) + ((-2 . -3) + ((-2 . -4) + (-3 . -4)))))) "
+    (Just
+        (Fml.Or
+            (Fml.And (Fml.Not v1) (Fml.Not v2))
+            (Fml.Or
+                (Fml.And (Fml.Not v1) (Fml.Not v3))
+                (Fml.Or
+                    (Fml.And (Fml.Not v1) (Fml.Not v4))
+                    (Fml.Or 
+                        (Fml.And (Fml.Not v2) (Fml.Not v3))
+                        (Fml.Or
+                            (Fml.And (Fml.Not v2) (Fml.Not v4))
+                            (Fml.And (Fml.Not v3) (Fml.Not v4))
+                        )
+                    )
+                )
+            )
+        )
+    )
+    (Comb.atMost [Var.mk i | i <- [1..4]] 2)
+
+testAtMostOne :: Test
+testAtMostOne =
+    TestCase $ assertEqual " A list from 1 to 4 with size 1 should return Just ((-1 . (-2 . -3)) + ((-1 . (-2 . -4)) + ((-1 . (-3 . -4)) + (-2 . (-3 . -4))))) "
+    (Just (Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.Not v3))) (Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v2) (Fml.Not v4))) (Fml.Or (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v3) (Fml.Not v4))) (Fml.And (Fml.Not v2) (Fml.And (Fml.Not v3) (Fml.Not v4)))))))
+    (Comb.atMostOne [Var.mk i | i <- [1..4]])
+
+
+-------------------------------------------- exactly TEST ------------------------------------------------------- 
+testExactlyWithEmptyList :: Test
+testExactlyWithEmptyList =
+    TestCase $ assertEqual " An empty list with any size should return Nothing "
+        Nothing
+        (Comb.exactly ([] :: [Var.Var Int]) 42)
+
+testExactlyWithZero :: Test
+testExactlyWithZero =
+    TestCase $ assertEqual " A list from 1 to 4 with size 0 should return Nothing "
+        Nothing
+        (Comb.exactly [Var.mk i | i <- [1..4]] 0)
+
+testExactlyWithANegativeSize :: Test
+testExactlyWithANegativeSize =
+    TestCase $ assertEqual " An negative size should return Nothing "
+        Nothing
+        (Comb.exactly [Var.mk i | i <- [1..4]] (-1))
+
+testExactlyWithATooBigSize :: Test
+testExactlyWithATooBigSize =
+    TestCase $ assertEqual " A size higher than the length of the list should return Nothing"
+        Nothing
+        (Comb.exactly [Var.mk i | i <- [1..4]] 42)
+
+testExactlyWithOne :: Test
+testExactlyWithOne =
+    TestCase $ assertEqual " A list from 1 to 4 with size 1 should return Just (((1 . 2) + ((1 . 3) + ((1 . 4) + ((2 . 3) + ((2 . 4) + (3 . 4)))))) . ((-1 . -2) + ((-1 . -3) + ((-1 . -4) + ((-2 . -3) + ((-2 . -4) + (-3 . -4))))))) "
+        (Just 
+            (Fml.And 
+                (Fml.Or v1
+                    (Fml.Or v2
+                        (Fml.Or v3 v4)))
+                (Fml.Or 
+                    (Fml.And (Fml.Not v1)
+                        (Fml.And (Fml.Not v2) (Fml.Not v3)))
+                    (Fml.Or
+                        (Fml.And (Fml.Not v1)
+                            (Fml.And (Fml.Not v2) (Fml.Not v4)))
+                        (Fml.Or
+                            (Fml.And (Fml.Not v1) (Fml.And (Fml.Not v3) (Fml.Not v4)))
+                            (Fml.And (Fml.Not v2) (Fml.And (Fml.Not v3) (Fml.Not v4)))
+                        )
+                    )
+                )
+            )
+        )
+        (Comb.exactly [Var.mk i | i <- [1..4]] 1)
+
+testExactlyWithTwo :: Test
+testExactlyWithTwo =
+    TestCase $ assertEqual " A list from 1 to 4 with size 1 should return Just ((1 + (2 + (3 + 4))) . ((-1 . (-2 . -3)) + ((-1 . (-2 . -4)) + ((-1 . (-3 . -4)) + (-2 . (-3 . -4)))))) "
+        (Just
+            (Fml.And
+                (Fml.Or
+                    (Fml.And v1 v2)
+                    (Fml.Or
+                        (Fml.And v1 v3)
+                        (Fml.Or
+                            (Fml.And v1 v4)
+                            (Fml.Or
+                                (Fml.And v2 v3)
+                                    (Fml.Or
+                                        (Fml.And v2 v4)
+                                        (Fml.And v3 v4)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                (Fml.Or
+                    (Fml.And (Fml.Not v1) (Fml.Not v2))
+                    (Fml.Or
+                        (Fml.And (Fml.Not v1) (Fml.Not v3))
+                        (Fml.Or
+                            (Fml.And (Fml.Not v1) (Fml.Not v4))
+                            (Fml.Or 
+                                (Fml.And (Fml.Not v2) (Fml.Not v3))
+                                (Fml.Or 
+                                    (Fml.And (Fml.Not v2) (Fml.Not v4))
+                                    (Fml.And (Fml.Not v3) (Fml.Not v4))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        (Comb.exactly [Var.mk i | i <- [1..4]] 2)
+
+testExactlyOne :: Test
+testExactlyOne =
+    TestCase $ assertEqual " A list from 1 to 4 should return Just ((1 + (2 + (3 + 4))) . ((-1 . (-2 . -3)) + ((-1 . (-2 . -4)) + ((-1 . (-3 . -4)) + (-2 . (-3 . -4)))))) "
+        (Just
+            (Fml.And
+                (Fml.Or v1 (Fml.Or v2 (Fml.Or v3 v4)))
+                (Fml.Or 
+                    (Fml.And
+                        (Fml.Not v1)
+                        (Fml.And (Fml.Not v2) (Fml.Not v3)))
+                    (Fml.Or
+                        (Fml.And
+                            (Fml.Not v1)
+                            (Fml.And (Fml.Not v2) (Fml.Not v4)))
+                        (Fml.Or
+                            (Fml.And
+                                (Fml.Not v1)
+                                (Fml.And (Fml.Not v3) (Fml.Not v4)))
+                            (Fml.And
+                                (Fml.Not v2)
+                                (Fml.And (Fml.Not v3) (Fml.Not v4))
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        (Comb.exactlyOne [Var.mk i | i <- [1..4]])
+
 ---------------------------------------------- MAIN -----------------------------------------------------------
 main :: IO ()
 main = do
@@ -350,6 +652,25 @@ main = do
                           testIsNotCNF, testIsNotCNF2, testIsNotCNF3, testIsNotCNF4, testIsNotCNF5, 
                           testIsNotCNF6 
                           ]
+    
+    -- Combinator
+    runTestTT $ TestList [  testMultOrWithEmptyList, testMultOr,                                                -- multOr
+
+                            testMultAndWithEmptyList, testMultAnd,                                              -- multAnd
+
+                            testAllOf, testAllOfWithEmptyList, testAllOf,                                       -- allOf
+                            
+                            testNoneOfWithEmptyList, testNoneOf,                                                -- noneOf
+
+                            testAtLeastWithEmptyList, testAtLeastWithZero, testAtLeastWithANegativeSize,        -- atLeast
+                            testAtLeastWithATooBigSize, testAtLeastWithOne, testAtLeastWithTwo, testAtLeastOne,
+
+                            testAtMostWithEmptyList, testAtMostWithZero, testAtMostWithANegativeSize,           -- atMost
+                            testAtMostWithATooBigSize, testAtMostWithOne, testAtMostWithTwo, testAtMostOne,
+
+                            testExactlyWithEmptyList, testExactlyWithZero, testExactlyWithANegativeSize,        -- exactly
+                            testExactlyWithATooBigSize, testExactlyWithOne, testExactlyWithTwo, testExactlyOne
+                        ]
     return()    
 
 
