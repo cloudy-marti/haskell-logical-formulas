@@ -126,9 +126,8 @@ Fml (..)
                   Or (And p q) r -> And (toCNF' (Or p r)) (toCNF' (Or q r))
                   Or p q         -> Or  (toCNF' p) (toCNF' q)
                   And p q        -> And (toCNF' p) (toCNF' q)
-                  Not p          -> Not p
+                  Not p          -> Not (toCNF' p)
                   Final p        -> Final p
-
 
   -- |’toDNF’ @f@ converts the formula @f@ to DNF.
   toDNF :: Fml a -> Fml a
@@ -266,7 +265,10 @@ Fml (..)
             toCCNF' fml = case fml of
                   And (And p q) (Or r s)  -> And (Or r s) (And (toCCNF' p) (toCCNF' q))
                   And (Or p q) (And r s)  -> And (Or p q) (And (toCCNF' r) (toCCNF' s))
+                  And p q                 -> And (toCCNF' p) (toCCNF' q)
                   Or p q                  -> Or p q
+                  Not p                   -> Not (toCCNF' p)
+                  Final p                 -> Final p
 
   -- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
   isCCNF :: Fml a -> Bool
