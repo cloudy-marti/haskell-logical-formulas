@@ -174,14 +174,42 @@ Fml (..)
   -- |’toUniversalNAnd’ @p@ returns a NAND-formula that is equivalent
   -- to formula @p@.
   toUniversalNAnd :: Fml a -> Fml a
-  toUniversalNAnd (Final p) = Final p
-  toUniversalNAnd (Not p)   = NAnd (toUniversalNAnd p) (toUniversalNAnd p)
-  toUniversalNAnd (Or p q)  = NAnd
-                              (NAnd (toUniversalNAnd p) (toUniversalNAnd p))
-                              (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
-  toUniversalNAnd (And p q) = NAnd
-                              (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
-                              (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
+  toUniversalNAnd (Final p)   = Final p
+  toUniversalNAnd (Not p)     = NAnd (toUniversalNAnd p) (toUniversalNAnd p)
+  toUniversalNAnd (Or p q)    = NAnd
+                                (NAnd (toUniversalNAnd p) (toUniversalNAnd p))
+                                (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
+  toUniversalNAnd (And p q)   = NAnd
+                                (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
+                                (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
+  toUniversalNAnd (NOr p q)   = NAnd 
+                                 (NAnd 
+                                   (NAnd (toUniversalNAnd p) (toUniversalNAnd p)) 
+                                   (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
+                                 ) 
+                                 (NAnd 
+                                   (NAnd (toUniversalNAnd p) (toUniversalNAnd p)) 
+                                   (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
+                                 )
+  toUniversalNAnd (XOr p q)   = NAnd 
+                                  (NAnd 
+                                    (toUniversalNAnd p) 
+                                    (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
+                                  ) 
+                                  (NAnd 
+                                    (toUniversalNAnd q)
+                                    (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
+                                  )
+  toUniversalNAnd (XNOr p q)  = NAnd 
+                                  (NAnd 
+                                    (NAnd (toUniversalNAnd p) (toUniversalNAnd p)) 
+                                    (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
+                                  ) 
+                                  (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
+  toUniversalNAnd (Equiv p q) = toUniversalNAnd (And (Imply p q) (Imply q p))
+  toUniversalNAnd (Imply p q) = NAnd (toUniversalNAnd p) (NAnd (toUniversalNAnd q) (toUniversalNAnd q))  -- toUniversalNAnd (Or (Not p) q)
+                                    
+                                    
 
   -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
   -- to formula @p@.

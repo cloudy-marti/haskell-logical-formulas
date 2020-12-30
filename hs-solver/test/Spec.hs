@@ -396,6 +396,63 @@ testIsNotDNF6 =
                            where 
                                c = Fml.Or (Fml.Not (Fml.And va vb)) vc
 
+-------------------------------------------- toUniversalNAnd TEST -------------------------------------------------------
+testConvertFinalToUniversalNAnd :: Test
+testConvertFinalToUniversalNAnd = 
+    TestCase $ assertEqual " A  should return !A NAnd !A " va (Fml.toUniversalNAnd c)
+                           where 
+                               c = va
+
+testConvertNotFinalToUniversalNAnd :: Test
+testConvertNotFinalToUniversalNAnd = 
+    TestCase $ assertEqual " !A  should return A NAnd A" (Fml.NAnd va va) (Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.Not va
+
+testConvertAndToUniversalNAnd :: Test
+testConvertAndToUniversalNAnd = 
+    TestCase $ assertEqual " (A ∧ B) should return ( A NAND B ) NAND ( A NAND B ) " (Fml.NAnd (Fml.NAnd va vb) (Fml.NAnd va vb)) (Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.And va vb
+
+testConvertOrToUniversalNAnd :: Test
+testConvertOrToUniversalNAnd = 
+    TestCase $ assertEqual " (A ∨ B) should return ( A NAND A ) NAND ( B NAND B ) " (Fml.NAnd (Fml.NAnd va va) (Fml.NAnd vb vb)) (Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.Or va vb
+
+testConvertNOrToUniversalNAnd :: Test
+testConvertNOrToUniversalNAnd = 
+    TestCase $ assertEqual " (A Nor B) should return (( A NAND A ) NAND ( B NAND B )) NAND (( A NAND A ) NAND ( B NAND B )) " 
+                             (Fml.NAnd (Fml.NAnd (Fml.NAnd va va) (Fml.NAnd vb vb)) (Fml.NAnd (Fml.NAnd va va) (Fml.NAnd vb vb))) (Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.NOr va vb
+
+testConvertXOrToUniversalNAnd :: Test
+testConvertXOrToUniversalNAnd = 
+    TestCase $ assertEqual " (A Xor B) should return (A NAND ( A NAND B )) NAND (B NAND ( A NAND B ))" 
+                             (Fml.NAnd (Fml.NAnd va (Fml.NAnd va vb)) (Fml.NAnd vb (Fml.NAnd va vb))) (Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.XOr va vb
+
+testConvertXNOrToUniversalNAnd :: Test
+testConvertXNOrToUniversalNAnd = 
+    TestCase $ assertEqual " (A XNor B) should return (( A NAND A ) NAND ( B NAND B )) NAND ( A NAND B ) " 
+                             (Fml.NAnd (Fml.NAnd (Fml.NAnd va va) (Fml.NAnd vb vb)) (Fml.NAnd va vb)) (Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.XNOr va vb
+
+testConvertImplyToUniversalNAnd :: Test
+testConvertImplyToUniversalNAnd = 
+    TestCase $ assertEqual " (A -> B) should return (a NAND ( B NAND B ))" (Fml.NAnd va (Fml.NAnd vb vb)) (Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.Imply va vb
+
+testConvertEquivToUniversalNAnd :: Test
+testConvertEquivToUniversalNAnd = 
+    TestCase $ assertEqual " (A <-> B) should return (a NAND ( B NAND B ))" (Fml.NAnd va (Fml.NAnd vb vb)) (Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.Equiv va vb
 ---------------------------------------- Combinator TESTS ------------------------------------------------------- 
 -------------------------------------------- multOr TEST ------------------------------------------------------- 
 testMultOrWithEmptyList :: Test
@@ -714,7 +771,12 @@ main = do
                           testIsNotCNF6,
                           testIsDNF, testIsDNF2, testIsDNF3, testIsDNF4, testIsDNF5,testIsDNF6,                 -- isDNF
                           testIsNotDNF, testIsNotDNF2, testIsNotDNF3, testIsNotDNF4, testIsNotDNF5,
-                          testIsNotDNF6 
+                          testIsNotDNF6,
+                          testConvertFinalToUniversalNAnd, testConvertNotFinalToUniversalNAnd,                  -- toUniversalNAnd   
+                          testConvertAndToUniversalNAnd, testConvertOrToUniversalNAnd,
+                          testConvertNOrToUniversalNAnd, testConvertXOrToUniversalNAnd,
+                          testConvertXNOrToUniversalNAnd, testConvertImplyToUniversalNAnd,
+                          testConvertEquivToUniversalNAnd     
                           ]
     
     -- Combinator
