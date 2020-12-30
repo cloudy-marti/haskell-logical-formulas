@@ -18,7 +18,7 @@ Fml (..)
 , isCNF
 , isUniversalNAnd
 , isUniversalNOr
--- , isCCNF
+, isCCNF
 , isDNF
 ) where
   import qualified Data.Logic.Var as Var
@@ -262,4 +262,13 @@ Fml (..)
   -- toCCNF :: Fml a -> Fml a
 
   -- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
-  -- isCCNF :: Fml a -> Bool
+  isCCNF :: Fml a -> Bool
+  isCCNF (Final _)                        = True
+  isCCNF (Not (Final _))                  = True
+  isCCNF (Or (Final _) (Or p q))          = isCCNF p && isCCNF q
+  isCCNF (Or (Not (Final _)) (Or p q))    = isCCNF p && isCCNF q
+  isCCNF (Or p q)                         = isCCNF p && isCCNF q
+  isCCNF (And (Final _) p)                = isCCNF p
+  isCCNF (And (Not (Final _)) p)          = isCCNF p
+  isCCNF (And (And _ _) _)                = False
+  isCCNF (And p q)                        = isCCNF p && isCCNF q
