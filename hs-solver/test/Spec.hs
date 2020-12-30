@@ -149,12 +149,6 @@ testConvertImplyFormulaToCNF2 =
                            where 
                                c = Fml.Imply (Fml.And va vb) vx
 
-testConvertFormulaToCNF:: Test
-testConvertFormulaToCNF = 
-    TestCase $ assertEqual "!(A ∨ (A -> B)) should return A ∧ (A ∧ !B) " (Fml.And (Fml.Not va) (Fml.And va (Fml.Not vb))) (Fml.toCNF c)
-                           where 
-                               c = Fml.Not (Fml.Or va (Fml.Imply va vb))
-
 testConvertComplexFormulaToCNF :: Test
 testConvertComplexFormulaToCNF = 
     TestCase $ assertEqual "!(!A ∨ B) ∨ (X -> !Y) should return ( A ∨ !X ∨ !Y) ∧ (!B ∨ !X ∨ !Y)" (Fml.And (Fml.Or va $ Fml.Or (Fml.Not vx) (Fml.Not vy)) (Fml.Or (Fml.Not vb) $ Fml.Or (Fml.Not vx) (Fml.Not vy)))(Fml.toCNF c)
@@ -673,6 +667,23 @@ testIsNotUniversalNOr8 =
 
 -------------------------------------------- toCCNF TEST -------------------------------------------------------
 
+testConvertFormulaToCCNF :: Test
+testConvertFormulaToCCNF = 
+    TestCase $ assertEqual "!(!A ∨ B) ∨ (X -> !Y) should return (A ∨ !X ∨ !Y) ∧ (!B ∨ !X ∨ !Y) " (Fml.And (Fml.Or va $ Fml.Or (Fml.Not vx) (Fml.Not vy)) (Fml.Or (Fml.Not vb) $ Fml.Or (Fml.Not vx) (Fml.Not vy)))  (Fml.toCCNF c)
+                           where 
+                               c = Fml.Or (Fml.Not (Fml.Or (Fml.Not va) vb)) (Fml.Imply vx (Fml.Not vy))
+
+testConvertFormulaToCCNF2 :: Test
+testConvertFormulaToCCNF2 = 
+    TestCase $ assertEqual "(!A -> B) -> (B -> !X) should return (!A ∨ !B ∨ !X) ∧ (!B ∨ !B ∨ !X) " (Fml.And (Fml.Or (Fml.Not va) $ Fml.Or (Fml.Not vb) (Fml.Not vx)) (Fml.Or (Fml.Not vb) $ Fml.Or (Fml.Not vb) (Fml.Not vx))) (Fml.toCCNF c)
+                           where 
+                               c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx))
+
+testConvertFormulaToCCNF3 :: Test
+testConvertFormulaToCCNF3 = 
+    TestCase $ assertEqual "(A ∧ B) -> X should return (!A ∨ !B) ∨ X" (Fml.Or (Fml.Or (Fml.Not va) (Fml.Not vb)) vx) (Fml.toCCNF c)
+                           where 
+                               c = Fml.Imply (Fml.And va vb) vx
 
 -------------------------------------------- isCCNF TEST -------------------------------------------------------
 
@@ -1004,7 +1015,6 @@ main = do
                           testConvertComplexFormulaToNNF, testConvertComplexFormulaToNNF2,
                           -- testConvertComplexFormulaToNNF3,
                           testConvertImplyFormulaToCNF, testConvertImplyFormulaToCNF2,                          -- toCNF
-                          testConvertFormulaToCNF,
                           testConvertComplexFormulaToCNF, testConvertComplexFormulaToCNF2,
                           -- testConvertComplexFormulaToCNF3,
                           testDNF,                                                                              -- toDNF (in progress)
@@ -1038,7 +1048,8 @@ main = do
                           testIsNotUniversalNOr, testIsNotUniversalNOr2, testIsNotUniversalNOr3,
                           testIsNotUniversalNOr4, testIsNotUniversalNOr5, testIsNotUniversalNOr6,
                           testIsNotUniversalNOr7, testIsNotUniversalNOr8,
-
+                          testConvertFormulaToCCNF, testConvertFormulaToCCNF2,                                  -- toCCNF
+                          testConvertFormulaToCCNF3,
                           testIsCCNF, testIsCCNF2, testIsCCNF3,                                                 -- isCCNF
                           testIsNotCCNF 
                           ]
