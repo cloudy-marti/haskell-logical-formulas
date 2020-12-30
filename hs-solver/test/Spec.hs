@@ -671,6 +671,32 @@ testIsNotUniversalNOr8 =
                            where 
                                c = Fml.Equiv va vb
 
+-------------------------------------------- toCCNF TEST -------------------------------------------------------
+
+
+-------------------------------------------- isCCNF TEST -------------------------------------------------------
+
+testIsCCNF :: Test
+testIsCCNF = 
+    TestCase $ assertEqual " A ∨ B should return True " True (Fml.isCCNF c)
+                           where 
+                               c = Fml.Or va vb
+
+testIsCCNF2 :: Test
+testIsCCNF2 = 
+    TestCase $ assertEqual " (A ∨ B) ∧ (!B ∨ C) should return True " True (Fml.isCCNF c)
+                           where 
+                               c = Fml.And (Fml.Or va vb) (Fml.Or (Fml.Not vb) vc)
+testIsCCNF3 :: Test
+testIsCCNF3 = 
+    TestCase $ assertEqual " (A ∨ B) ∧ ((!B ∨ C) ∧ (A ∨ B ∨ !C)) should return True " True (Fml.isCCNF c)
+                           where 
+                               c = Fml.And (Fml.Or va vb) $ Fml.And (Fml.Or (Fml.Not vb) vc) (Fml.Or va $ Fml.Or vb (Fml.Not vc))
+testIsNotCCNF :: Test
+testIsNotCCNF = 
+    TestCase $ assertEqual " ((A ∨ B) ∧ (!B ∨ C)) ∧ (A ∨ B ∨ !C) should return False " False (Fml.isCCNF c)
+                           where 
+                               c = Fml.And (Fml.And (Fml.Or va vb) (Fml.Or (Fml.Not vb) vc)) (Fml.Or va $ Fml.Or vb (Fml.Not vc))
 
 ---------------------------------------- Combinator TESTS ------------------------------------------------------- 
 -------------------------------------------- multOr TEST ------------------------------------------------------- 
@@ -1007,11 +1033,14 @@ main = do
                           testIsNotUniversalNAnd, testIsNotUniversalNAnd2, testIsNotUniversalNAnd3,
                           testIsNotUniversalNAnd4, testIsNotUniversalNAnd5, testIsNotUniversalNAnd6,
                           testIsNotUniversalNAnd7, testIsNotUniversalNAnd8,
-                          testIsUniversalNOr, testIsUniversalNOr2, testIsUniversalNOr3,                      -- isUniversalNOr
+                          testIsUniversalNOr, testIsUniversalNOr2, testIsUniversalNOr3,                         -- isUniversalNOr
                           testIsUniversalNOr4, testIsUniversalNOr5,
                           testIsNotUniversalNOr, testIsNotUniversalNOr2, testIsNotUniversalNOr3,
                           testIsNotUniversalNOr4, testIsNotUniversalNOr5, testIsNotUniversalNOr6,
-                          testIsNotUniversalNOr7, testIsNotUniversalNOr8
+                          testIsNotUniversalNOr7, testIsNotUniversalNOr8,
+
+                          testIsCCNF, testIsCCNF2, testIsCCNF3,                                                 -- isCCNF
+                          testIsNotCCNF 
                           ]
     
     -- Combinator
