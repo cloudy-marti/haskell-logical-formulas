@@ -9,7 +9,7 @@ Fml (..)
 -- * Transforming
 , toNNF
 , toCNF
--- , toCCNF
+, toCCNF
 , toDNF
 , toUniversalNAnd
 , toUniversalNOr
@@ -259,7 +259,14 @@ Fml (..)
   isUniversalNOr _            = False
 
   -- |’toCCNF’ @f@ converts the formula @f@ to CCNF.
-  -- toCCNF :: Fml a -> Fml a
+  toCCNF :: Fml a -> Fml a
+  toCCNF = toCCNF' . toCNF
+      where 
+            toCCNF' :: Fml a -> Fml a
+            toCCNF' fml = case fml of
+                  And (And p q) (Or r s)  -> And (Or r s) (And (toCCNF' p) (toCCNF' q))
+                  And (Or p q) (And r s)  -> And (Or p q) (And (toCCNF' r) (toCCNF' s))
+                  Or p q                  -> Or p q
 
   -- |’isCCNF’ @f@ returns true iff formula @f@ is CCNF.
   isCCNF :: Fml a -> Bool
@@ -268,7 +275,7 @@ Fml (..)
   isCCNF (Or (Final _) (Or p q))          = isCCNF p && isCCNF q
   isCCNF (Or (Not (Final _)) (Or p q))    = isCCNF p && isCCNF q
   isCCNF (Or p q)                         = isCCNF p && isCCNF q
-  isCCNF (And (Final _) p)                = isCCNF p
-  isCCNF (And (Not (Final _)) p)          = isCCNF p
+  isCCNF (And (Final _) _)                = False
+  isCCNF (And (Not (Final _)) _)          = False
   isCCNF (And (And _ _) _)                = False
   isCCNF (And p q)                        = isCCNF p && isCCNF q
