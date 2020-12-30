@@ -96,10 +96,10 @@ Fml (..)
   -- |’toNNF’ @f@ converts the formula @f@ to NNF.
   toNNF :: Fml a -> Fml a
   toNNF (Not (Not p))     = toNNF p
-  toNNF (Not (Or p q))    = toNNF (NOr p q)
-  toNNF (Not (And p q))   = toNNF (NAnd p q)
   toNNF (NAnd p q)        = Or  (toNNF (Not p)) (toNNF (Not q))
   toNNF (NOr p q)         = And (toNNF (Not p)) (toNNF (Not q))
+  toNNF (Not (Or p q))    = toNNF (NOr p q)
+  toNNF (Not (And p q))   = toNNF (NAnd p q)
   toNNF (Not(Equiv p q))  = Or  (And (toNNF p) (toNNF (Not q))) (And (toNNF (Not p)) (toNNF q))
   toNNF (Not(Imply p q))  = And  (toNNF p) (toNNF (Not q))
 
@@ -108,8 +108,8 @@ Fml (..)
   toNNF (Equiv p q)       = And (toNNF (Imply p q)) (toNNF (Imply q p))
   toNNF (Imply p q)       = Or  (toNNF (Not p)) (toNNF q)
   toNNF (XOr p q)         = And (Or  (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
-  -- toNNF (XNOr p q)        = Or  (And (toNNF p) (toNNF q)) (And (toNNF (Not p)) (toNNF (Not q)))
-  toNNF (XNOr p q)        = And  (Or (toNNF (Not p)) (toNNF q)) (Or (toNNF p) (toNNF (Not q)))
+  toNNF (XNOr p q)        = Or  (And (toNNF p) (toNNF q)) (And (toNNF (Not p)) (toNNF (Not q)))
+  -- toNNF (XNOr p q)        = And  (Or (toNNF (Not p)) (toNNF q)) (Or (toNNF p) (toNNF (Not q)))
   toNNF (Not p)           = Not (toNNF p)
   toNNF (Final p)         = Final p
 
@@ -162,11 +162,12 @@ Fml (..)
 
   -- |’isDNF’ @f@ returns true if formula @f@ is DNF.
   isDNF :: Fml a -> Bool
-  isDNF (Not p)                   = isCNF p
+  isDNF (Not (Final _))           = True
+  isDNF (Not _)                   = False
+  isDNF (And (Final _) (Final _)) = True
+  isDNF (And p q)                 = isDNF p && isDNF q
   isDNF (Or (Final _) (Final _))  = False
   isDNF (Or p q)                  = isDNF p && isDNF q
-  isDNF (And (Final _) (Final _)) = True
-  isDNF (And _ _)                 = False
   isDNF (Final _)                 = True
   isDNF _                         = False
 

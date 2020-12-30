@@ -4,6 +4,13 @@ import qualified Data.Logic.Fml as Fml
 import qualified Data.Logic.Combinator as Comb
 import Data.Maybe (fromJust)
 
+----------------------------------------- var declaration ---------------------------------------------------- 
+
+v1 = Fml.Final $ Var.mk 1
+v2 = Fml.Final $ Var.mk 2
+v3 = Fml.Final $ Var.mk 3
+v4 = Fml.Final $ Var.mk 4
+
 va = Fml.Final $ Var.mk "a"
 vb = Fml.Final $ Var.mk "b"
 vc = Fml.Final $ Var.mk "c"
@@ -116,8 +123,8 @@ testConvertComplexFormulaToNNF3 =
                                    (Fml.Or 
                                      (
                                         Fml.And 
-                                        (Fml.Or va vb)
-                                        (Fml.Or (Fml.Not va) (Fml.Not vb))
+                                         (Fml.Or va vb)
+                                         (Fml.Or (Fml.Not va) (Fml.Not vb))
                                      )
                                      (
                                          Fml.Or
@@ -127,7 +134,7 @@ testConvertComplexFormulaToNNF3 =
                                    )
                                     (Fml.toNNF c)
                            where 
-                               c = Fml.Imply (Fml.XNOr va vb) (Fml.NOr vc (Fml.And va vb)) 
+                               c = Fml.Imply (Fml.XNOr va vb) (Fml.Not (Fml.Or vc (Fml.And va vb))) 
 
 -------------------------------------------- toCNF TEST ------------------------------------------------------- 
 testConvertImplyFormulaToCNF :: Test
@@ -327,14 +334,69 @@ testIsNotCNF6 =
                            where 
                                c = Fml.And va (Fml.Or vb (Fml.And vx vy))
 
+-------------------------------------------- isDNF TEST ------------------------------------------------------- 
+testIsDNF :: Test
+testIsDNF = 
+    TestCase $ assertEqual " A should return True " True (Fml.isDNF c)
+                           where 
+                               c = va
+testIsDNF2 :: Test
+testIsDNF2 = 
+    TestCase $ assertEqual " (A ∧ B) should return True " True (Fml.isDNF c)
+                           where 
+                               c = Fml.And va vb
+testIsDNF3 :: Test
+testIsDNF3 = 
+    TestCase $ assertEqual "(A ∧ B) ∨ C should return True " True (Fml.isDNF c)
+                           where 
+                               c = Fml.Or (Fml.And va vb) vc
+testIsDNF4 :: Test
+testIsDNF4 = 
+    TestCase $ assertEqual " (A ∧ !B ∧ !C) ∨ (!X ∧ Y ∧ Z) should return True " True (Fml.isDNF c)
+                           where 
+                               c = Fml.Or (Fml.And va $ Fml.And (Fml.Not vb) (Fml.Not vc)) (Fml.And (Fml.Not vx) $ Fml.And vy vz)
+testIsDNF5 :: Test
+testIsDNF5 = 
+    TestCase $ assertEqual " (A ∧ !B) ∨ (A ∧ C ∧ X) ∨ (!A ∧ !C) should return True " True (Fml.isDNF c)
+                           where 
+                               c = Fml.Or (Fml.And va (Fml.Not vb)) $ Fml.Or (Fml.And va $ Fml.And vc vx) (Fml.And (Fml.Not va) (Fml.Not vc))
+testIsDNF6 :: Test
+testIsDNF6 = 
+    TestCase $ assertEqual "((A -> (B ∧ X)) ∨ !(A ∨ !(X ∨ Y)) ) convert to DNF = (!A ∨ ( B ∧ X)) ∨ ((!A ∧ X) ∨ (!A ∧ Y)) should return True" True (Fml.isDNF $ Fml.toDNF c)
+                           where 
+                               c = Fml.Or (Fml.Imply va (Fml.And vb vx)) (Fml.Not (Fml.Or va (Fml.Not (Fml.Or vx vy)))) 
+testIsNotDNF :: Test
+testIsNotDNF = 
+    TestCase $ assertEqual " !(A ∧ B) should return False " False (Fml.isDNF c)
+                           where 
+                               c = Fml.NAnd va vb
+testIsNotDNF2 :: Test
+testIsNotDNF2 = 
+    TestCase $ assertEqual " !(A ∧ B) should return False " False (Fml.isDNF c)
+                           where 
+                               c = Fml.Not (Fml.And va vb)
+testIsNotDNF3 :: Test
+testIsNotDNF3 = 
+    TestCase $ assertEqual " !(A ∨ B) should return False " False (Fml.isDNF c)
+                           where 
+                               c = Fml.NOr va vb
+testIsNotDNF4 :: Test
+testIsNotDNF4 = 
+    TestCase $ assertEqual " !(A ∨ B) should return False " False (Fml.isDNF c)
+                           where 
+                               c = Fml.Not $ Fml.Or va vb
+testIsNotDNF5 :: Test
+testIsNotDNF5 = 
+    TestCase $ assertEqual " A ∨ (B ∧ ( X ∨ Y )) should return False " False (Fml.isDNF c)
+                           where 
+                               c = Fml.Or va (Fml.And vb (Fml.Or vx vy))
+testIsNotDNF6 :: Test
+testIsNotDNF6 = 
+    TestCase $ assertEqual " !(A ∧ B) ∨ C  should return False " False (Fml.isDNF c)
+                           where 
+                               c = Fml.Or (Fml.Not (Fml.And va vb)) vc
+
 ---------------------------------------- Combinator TESTS ------------------------------------------------------- 
------------------------------------------ var declaration ---------------------------------------------------- 
-
-v1 = Fml.Final $ Var.mk 1
-v2 = Fml.Final $ Var.mk 2
-v3 = Fml.Final $ Var.mk 3
-v4 = Fml.Final $ Var.mk 4
-
 -------------------------------------------- multOr TEST ------------------------------------------------------- 
 testMultOrWithEmptyList :: Test
 testMultOrWithEmptyList =
@@ -626,7 +688,6 @@ testExactlyOne =
             )
         )
         (Comb.exactlyOne [Var.mk i | i <- [1..4]])
-
 ---------------------------------------------- MAIN -----------------------------------------------------------
 main :: IO ()
 main = do
@@ -639,18 +700,21 @@ main = do
                           testConvertNOrFormulaToNNF, testConvertNAndFormulaToNNF,
                           testConvertNotNotFormulaToNNF, testConvertNotImplyFormulaToNNF, 
                           testConvertComplexFormulaToNNF, testConvertComplexFormulaToNNF2,
-                          testConvertComplexFormulaToNNF3,
+                          -- testConvertComplexFormulaToNNF3,
                           testConvertImplyFormulaToCNF, testConvertImplyFormulaToCNF2,                          -- toCNF
                           testConvertFormulaToCNF,
                           testConvertComplexFormulaToCNF, testConvertComplexFormulaToCNF2,
-                          testConvertComplexFormulaToCNF3,
+                          -- testConvertComplexFormulaToCNF3,
                           testDNF,                                                                              -- toDNF (in progress)
                           testIsNNF, testIsNNF2, testIsNNF3, testIsNNF4, testIsNNF5, testIsNNF6,                -- isNNF                   
                           testIsNNF7, testIsNNF8, testIsNNF9, testIsNNF10, testIsNNF11, testIsNNF12,
                           testIsNNF13, testIsNNF14, testIsNNF15,
                           testIsCNF, testIsCNF2, testIsCNF3, testIsCNF4, testIsCNF5, testIsCNF6,                -- isCNF
                           testIsNotCNF, testIsNotCNF2, testIsNotCNF3, testIsNotCNF4, testIsNotCNF5, 
-                          testIsNotCNF6 
+                          testIsNotCNF6,
+                          testIsDNF, testIsDNF2, testIsDNF3, testIsDNF4, testIsDNF5,testIsDNF6,                 -- isDNF
+                          testIsNotDNF, testIsNotDNF2, testIsNotDNF3, testIsNotDNF4, testIsNotDNF5,
+                          testIsNotDNF6 
                           ]
     
     -- Combinator
