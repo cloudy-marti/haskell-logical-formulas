@@ -16,6 +16,8 @@ Fml (..)
 -- * Testing
 , isNNF
 , isCNF
+, isUniversalNAnd
+, isUniversalNOr
 -- , isCCNF
 , isDNF
 ) where

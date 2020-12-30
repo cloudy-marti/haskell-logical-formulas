@@ -514,6 +514,164 @@ testConvertEquivToUniversalNOr =
     TestCase $ assertEqual " (A <-> B) should return TODO" (Fml.NOr va vb) (Fml.toUniversalNOr c)
                            where 
                                c = Fml.Equiv va vb
+
+-------------------------------------------- isUniversalNAnd TEST -------------------------------------------------------
+testIsUniversalNAnd :: Test
+testIsUniversalNAnd = 
+    TestCase $ assertEqual " A should return True " True (Fml.isUniversalNAnd c)
+                           where 
+                               c = va
+
+testIsUniversalNAnd2 :: Test
+testIsUniversalNAnd2 = 
+    TestCase $ assertEqual " (A NAND B) should return True " True (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.NAnd va vb
+
+testIsUniversalNAnd3 :: Test
+testIsUniversalNAnd3 = 
+    TestCase $ assertEqual " ( (A NAND A) NAND (B NAND B)) should return True " True (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.NAnd (Fml.NAnd va va) (Fml.NAnd vb vb)
+
+testIsUniversalNAnd4 :: Test
+testIsUniversalNAnd4 = 
+    TestCase $ assertEqual " (A NAND ( A NAND B )) NAND (B NAND ( A NAND B )) should return True " True (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.NAnd (Fml.NAnd va (Fml.NAnd va vb)) (Fml.NAnd vb (Fml.NAnd va vb))
+
+testIsUniversalNAnd5 :: Test
+testIsUniversalNAnd5 = 
+    TestCase $ assertEqual " !(!A ∨ B) ∨ (X -> !Y) converted to universal NAnd should return True " True (Fml.isUniversalNAnd $ Fml.toUniversalNAnd c)
+                           where 
+                               c = Fml.Or (Fml.Not (Fml.Or (Fml.Not va) vb)) (Fml.Imply vx (Fml.Not vy))
+
+testIsNotUniversalNAnd :: Test
+testIsNotUniversalNAnd = 
+    TestCase $ assertEqual " !A should return False " False (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.Not va
+
+testIsNotUniversalNAnd2 :: Test
+testIsNotUniversalNAnd2 = 
+    TestCase $ assertEqual " A ∧ B should return False " False (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.And va vb
+
+testIsNotUniversalNAnd3 :: Test
+testIsNotUniversalNAnd3 = 
+    TestCase $ assertEqual " A ∨ B should return False " False (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.Or va vb
+
+testIsNotUniversalNAnd4 :: Test
+testIsNotUniversalNAnd4 = 
+    TestCase $ assertEqual " A Nor B should return False " False (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.NOr va vb
+testIsNotUniversalNAnd5 :: Test
+testIsNotUniversalNAnd5 = 
+    TestCase $ assertEqual " A XOr B should return False " False (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.XOr va vb
+
+testIsNotUniversalNAnd6 :: Test
+testIsNotUniversalNAnd6 = 
+    TestCase $ assertEqual " A XNOr B should return False " False (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.XNOr va vb
+
+testIsNotUniversalNAnd7 :: Test
+testIsNotUniversalNAnd7 = 
+    TestCase $ assertEqual " A -> B should return False " False (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.Imply va vb
+
+testIsNotUniversalNAnd8 :: Test
+testIsNotUniversalNAnd8 = 
+    TestCase $ assertEqual " A <-> B should return False " False (Fml.isUniversalNAnd c)
+                           where 
+                               c = Fml.Equiv va vb
+
+-------------------------------------------- isUniversalNOr TEST -------------------------------------------------------
+testIsUniversalNOr :: Test
+testIsUniversalNOr = 
+    TestCase $ assertEqual " A should return True " True (Fml.isUniversalNOr c)
+                           where 
+                               c = va
+
+testIsUniversalNOr2 :: Test
+testIsUniversalNOr2 = 
+    TestCase $ assertEqual " (A NOR B) should return True " True (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.NOr va vb
+
+testIsUniversalNOr3 :: Test
+testIsUniversalNOr3 = 
+    TestCase $ assertEqual " ( (A NOR A) NOR (B NOR B)) should return True " True (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.NOr (Fml.NOr va va) (Fml.NOr vb vb)
+
+testIsUniversalNOr4 :: Test
+testIsUniversalNOr4 = 
+    TestCase $ assertEqual " (A NOR ( A NOR B )) NOR (B NOR ( A NOR B )) should return True " True (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.NOr (Fml.NOr va (Fml.NOr va vb)) (Fml.NOr vb (Fml.NOr va vb))
+
+testIsUniversalNOr5 :: Test
+testIsUniversalNOr5 = 
+    TestCase $ assertEqual " !(!A ∨ B) ∨ (X -> !Y) converted to universal NOr should return True " True (Fml.isUniversalNOr $ Fml.toUniversalNOr c)
+                           where 
+                               c = Fml.Or (Fml.Not (Fml.Or (Fml.Not va) vb)) (Fml.Imply vx (Fml.Not vy))
+
+testIsNotUniversalNOr :: Test
+testIsNotUniversalNOr = 
+    TestCase $ assertEqual " !A should return False " False (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.Not va
+
+testIsNotUniversalNOr2 :: Test
+testIsNotUniversalNOr2 = 
+    TestCase $ assertEqual " A ∧ B should return False " False (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.And va vb
+
+testIsNotUniversalNOr3 :: Test
+testIsNotUniversalNOr3 = 
+    TestCase $ assertEqual " A ∨ B should return False " False (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.Or va vb
+
+testIsNotUniversalNOr4 :: Test
+testIsNotUniversalNOr4 = 
+    TestCase $ assertEqual " A NAnd B should return False " False (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.NAnd va vb
+testIsNotUniversalNOr5 :: Test
+testIsNotUniversalNOr5 = 
+    TestCase $ assertEqual " A XOr B should return False " False (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.XOr va vb
+
+testIsNotUniversalNOr6 :: Test
+testIsNotUniversalNOr6 = 
+    TestCase $ assertEqual " A XNOr B should return False " False (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.XNOr va vb
+
+testIsNotUniversalNOr7 :: Test
+testIsNotUniversalNOr7 = 
+    TestCase $ assertEqual " A -> B should return False " False (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.Imply va vb
+
+testIsNotUniversalNOr8 :: Test
+testIsNotUniversalNOr8 = 
+    TestCase $ assertEqual " A <-> B should return False " False (Fml.isUniversalNOr c)
+                           where 
+                               c = Fml.Equiv va vb
+
+
 ---------------------------------------- Combinator TESTS ------------------------------------------------------- 
 -------------------------------------------- multOr TEST ------------------------------------------------------- 
 testMultOrWithEmptyList :: Test
@@ -841,9 +999,19 @@ main = do
                           -- testConvertXOrToUniversalNAnd,
                           testConvertFinalToUniversalNOr, testConvertNotFinalToUniversalNOr,                    -- toUniversalNOr   
                           testConvertAndToUniversalNOr, testConvertOrToUniversalNOr,
-                          testConvertNAndToUniversalNOr, testConvertImplyToUniversalNOr
+                          testConvertNAndToUniversalNOr, testConvertImplyToUniversalNOr,
                           -- testConvertEquivToUniversalNOr
-                          -- testConvertXOrToUniversalNOr, testConvertXNOrToUniversalNOr,          
+                          -- testConvertXOrToUniversalNOr, testConvertXNOrToUniversalNOr, 
+                          testIsUniversalNAnd, testIsUniversalNAnd2, testIsUniversalNAnd3,                      -- isUniversalNAnd
+                          testIsUniversalNAnd4, testIsUniversalNAnd5,
+                          testIsNotUniversalNAnd, testIsNotUniversalNAnd2, testIsNotUniversalNAnd3,
+                          testIsNotUniversalNAnd4, testIsNotUniversalNAnd5, testIsNotUniversalNAnd6,
+                          testIsNotUniversalNAnd7, testIsNotUniversalNAnd8,
+                          testIsUniversalNOr, testIsUniversalNOr2, testIsUniversalNOr3,                      -- isUniversalNOr
+                          testIsUniversalNOr4, testIsUniversalNOr5,
+                          testIsNotUniversalNOr, testIsNotUniversalNOr2, testIsNotUniversalNOr3,
+                          testIsNotUniversalNOr4, testIsNotUniversalNOr5, testIsNotUniversalNOr6,
+                          testIsNotUniversalNOr7, testIsNotUniversalNOr8
                           ]
     
     -- Combinator
