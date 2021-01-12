@@ -684,6 +684,11 @@ testConvertFormulaToCCNF3 =
     TestCase $ assertEqual "(A ∧ B) -> X should return (!A ∨ !B) ∨ X" (Fml.Or (Fml.Or (Fml.Not va) (Fml.Not vb)) vx) (Fml.toCCNF c)
                            where 
                                c = Fml.Imply (Fml.And va vb) vx
+testConvertFormulaToCCNF4 :: Test
+testConvertFormulaToCCNF4 = 
+    TestCase $ assertEqual  "((A ∨ B) ∧ (B ∨ A)) ∧ ((!X ∨ !Y)  ∧ (!Y ∨ !X)) should return (A ∨ B) ∧ (B ∨ A) ∧ (!X ∨ !Y)  ∧ (!Y ∨ !X)" (Fml.And (Fml.Or va vb) $ Fml.And (Fml.Or vb va) $ Fml.And (Fml.Or (Fml.Not vx) (Fml.Not vy)) (Fml.Or (Fml.Not vy) (Fml.Not vx))) (Fml.toCCNF c)
+                           where 
+                               c = Fml.And (Fml.And (Fml.Or va vb) (Fml.Or vb va)) (Fml.And (Fml.Or (Fml.Not vx) (Fml.Not vy)) (Fml.Or (Fml.Not vy) (Fml.Not vx)))
 
 -------------------------------------------- isCCNF TEST -------------------------------------------------------
 
@@ -1049,7 +1054,7 @@ main = do
                           testIsNotUniversalNOr4, testIsNotUniversalNOr5, testIsNotUniversalNOr6,
                           testIsNotUniversalNOr7, testIsNotUniversalNOr8,
                           testConvertFormulaToCCNF, testConvertFormulaToCCNF2,                                  -- toCCNF
-                          testConvertFormulaToCCNF3,
+                          testConvertFormulaToCCNF3,testConvertFormulaToCCNF4,
                           testIsCCNF, testIsCCNF2, testIsCCNF3,                                                 -- isCCNF
                           testIsNotCCNF 
                           ]

@@ -112,7 +112,8 @@ Fml (..)
   toNNF (Imply p q)       = Or  (toNNF (Not p)) (toNNF q)
   toNNF (XOr p q)         = And (Or  (toNNF p) (toNNF q)) (Not (And (toNNF p) (toNNF q)))
   toNNF (XNOr p q)        = Or  (And (toNNF p) (toNNF q)) (And (toNNF (Not p)) (toNNF (Not q)))
-  -- toNNF (XNOr p q)        = And  (Or (toNNF (Not p)) (toNNF q)) (Or (toNNF p) (toNNF (Not q)))
+  -- XNor can also be implemented this way:
+  -- toNNF (XNOr p q)        = And  (Or (toNNF (Not p)) (toNNF q)) (Or (toNNF p) (toNNF (Not q))) 
   toNNF (Not p)           = Not (toNNF p)
   toNNF (Final p)         = Final p
 
@@ -189,44 +190,6 @@ Fml (..)
                   Not p          -> NAnd (toUniversalNAnd' p) (toUniversalNAnd' p)
                   Final p        -> Final p
 
-
---   toUniversalNAnd (Final p)   = Final p
---   toUniversalNAnd (Not p)     = NAnd (toUniversalNAnd p) (toUniversalNAnd p)
---   toUniversalNAnd (Or p q)    = NAnd
---                                 (NAnd (toUniversalNAnd p) (toUniversalNAnd p))
---                                 (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
---   toUniversalNAnd (And p q)   = NAnd
---                                 (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
---                                 (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
---   toUniversalNAnd (NOr p q)   = NAnd 
---                                  (NAnd 
---                                    (NAnd (toUniversalNAnd p) (toUniversalNAnd p)) 
---                                    (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
---                                  ) 
---                                  (NAnd 
---                                    (NAnd (toUniversalNAnd p) (toUniversalNAnd p)) 
---                                    (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
---                                  )
---   toUniversalNAnd (XOr p q)   = NAnd 
---                                   (NAnd 
---                                     (toUniversalNAnd p) 
---                                     (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
---                                   ) 
---                                   (NAnd 
---                                     (toUniversalNAnd q)
---                                     (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
---                                   )
---   toUniversalNAnd (XNOr p q)  = NAnd 
---                                   (NAnd 
---                                     (NAnd (toUniversalNAnd p) (toUniversalNAnd p)) 
---                                     (NAnd (toUniversalNAnd q) (toUniversalNAnd q))
---                                   ) 
---                                   (NAnd (toUniversalNAnd p) (toUniversalNAnd q))
---   toUniversalNAnd (Equiv p q) = toUniversalNAnd (And (Imply p q) (Imply q p))
---   toUniversalNAnd (Imply p q) = NAnd (toUniversalNAnd p) (NAnd (toUniversalNAnd q) (toUniversalNAnd q))  -- toUniversalNAnd (Or (Not p) q)
-                                    
-                                    
-
   -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
   -- to formula @p@.
   toUniversalNOr :: Fml a -> Fml a
@@ -265,6 +228,7 @@ Fml (..)
             toCCNF' fml = case fml of
                   And (And p q) (Or r s)  -> And (Or r s) (And (toCCNF' p) (toCCNF' q))
                   And (Or p q) (And r s)  -> And (Or p q) (And (toCCNF' r) (toCCNF' s))
+                  And (And p q) (And r s) -> And (toCCNF' p) (And (toCCNF' q) (And (toCCNF' r) (toCCNF' s)))
                   And p q                 -> And (toCCNF' p) (toCCNF' q)
                   Or p q                  -> Or p q
                   Not p                   -> Not (toCCNF' p)
