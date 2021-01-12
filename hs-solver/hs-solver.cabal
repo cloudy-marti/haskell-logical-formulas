@@ -4,15 +4,17 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d81e262f796d4003f36f012daf9e1a24c609f40306f5d97299f401fa63458975
+-- hash: 8ef79ce5821a49eb8c82cd4ed5c3ec5dfa0e6ada6ab36f90ade30a11d2ea5169
 
 name:           hs-solver
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/hyliancloud/INFO_Haskell_Project#readme>
-homepage:       https://github.com/hyliancloud/INFO_Haskell_Project#readme
-bug-reports:    https://github.com/hyliancloud/INFO_Haskell_Project/issues
+synopsis:       A project about handling and transformation of logical formulas using Haskell.
+description:    Please see the README on GitHub at <https://github.com/cloudy-marti/INFO_Haskell_Project#readme>
+category:       Mathematical logic
+homepage:       https://github.com/cloudy-marti/INFO_Haskell_Project#readme
+bug-reports:    https://github.com/cloudy-marti/INFO_Haskell_Project/issues
 author:         Vincent AGULLO & Emilie MARTI
-maintainer:     bgdu93@gmail.com
+maintainer:     Vincent AGULLO & Emilie MARTI
 copyright:      2020 Vincent Agullo & Emilie Marti
 license:        BSD3
 license-file:   LICENSE
@@ -23,7 +25,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/hyliancloud/INFO_Haskell_Project
+  location: https://github.com/cloudy-marti/INFO_Haskell_Project
 
 library
   exposed-modules:
@@ -47,6 +49,7 @@ test-suite hs-solver-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Data.Logic.CombTests
       Paths_hs_solver
   hs-source-dirs:
       test
