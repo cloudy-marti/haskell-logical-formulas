@@ -115,26 +115,7 @@ testConvertComplexFormulaToNNF2 :: Test
 testConvertComplexFormulaToNNF2 = 
     TestCase $ assertEqual "(!A -> B) -> (B -> !X) should return (!A ∧ !B) ∨ (!B ∨ !X)" (Fml.Or (Fml.And (Fml.Not va) (Fml.Not vb)) (Fml.Or (Fml.Not vb) (Fml.Not vx))) (Fml.toNNF c)
                            where 
-                               c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx))
-
-testConvertComplexFormulaToNNF3 :: Test
-testConvertComplexFormulaToNNF3 = 
-    TestCase $ assertEqual "(A ⊙ B) -> !(C ∨ (A ∧ B)) should return NNF ?????" 
-                                   (Fml.Or 
-                                     (
-                                        Fml.And 
-                                         (Fml.Or va vb)
-                                         (Fml.Or (Fml.Not va) (Fml.Not vb))
-                                     )
-                                     (
-                                         Fml.Or
-                                         (Fml.Not vc)
-                                         (Fml.And (Fml.Not va) (Fml.Not vb))
-                                     )
-                                   )
-                                    (Fml.toNNF c)
-                           where 
-                               c = Fml.Imply (Fml.XNOr va vb) (Fml.Not (Fml.Or vc (Fml.And va vb))) 
+                               c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx)) 
 
 -------------------------------------------- toCNF TEST ------------------------------------------------------- 
 testConvertImplyFormulaToCNF :: Test
@@ -160,21 +141,7 @@ testConvertComplexFormulaToCNF2 :: Test
 testConvertComplexFormulaToCNF2 = 
     TestCase $ assertEqual "(!A -> B) -> (B -> !X) should return (!A ∨ !B ∨ !X) ∧ (!B ∨ !X)" (Fml.And (Fml.Or (Fml.Not va) $ Fml.Or (Fml.Not vb) (Fml.Not vx)) (Fml.Or (Fml.Not vb) (Fml.Not vx))) (Fml.toCNF c)
                            where 
-                               c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx))
-
-testConvertComplexFormulaToCNF3 :: Test
-testConvertComplexFormulaToCNF3 = 
-    TestCase $ assertEqual "(A ⊙ B) -> !(C ∨ (A ∧ B)) should return ????" 
-                                   (Fml.And 
-                                     (Fml.Or va $ Fml.Or vb $ Fml.Or (Fml.Not vc) (Fml.Not va)) $
-                                    Fml.And
-                                     (Fml.Or va $ Fml.Or vb $ Fml.Or (Fml.Not vc) (Fml.Not vb)) $
-                                    Fml.And 
-                                     (Fml.Or (Fml.Not va) $ Fml.Or (Fml.Not vb) $ Fml.Or (Fml.Not vc) (Fml.Not va)) 
-                                     (Fml.Or (Fml.Not va) $ Fml.Or (Fml.Not vb) $ Fml.Or (Fml.Not vc) (Fml.Not vb))) 
-                                    (Fml.toCNF c)
-                           where 
-                               c = Fml.Imply (Fml.XNOr va vb) (Fml.NOr vc (Fml.And va vb)) 
+                               c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx)) 
 
 -------------------------------------------- toDNF TEST ------------------------------------------------------- 
 -- TODO ADD OTHER TEST
@@ -1018,10 +985,8 @@ main = do
                           testConvertNOrFormulaToNNF, testConvertNAndFormulaToNNF,
                           testConvertNotNotFormulaToNNF, testConvertNotImplyFormulaToNNF, 
                           testConvertComplexFormulaToNNF, testConvertComplexFormulaToNNF2,
-                          -- testConvertComplexFormulaToNNF3,
                           testConvertImplyFormulaToCNF, testConvertImplyFormulaToCNF2,                          -- toCNF
                           testConvertComplexFormulaToCNF, testConvertComplexFormulaToCNF2,
-                          -- testConvertComplexFormulaToCNF3,
                           testDNF,                                                                              -- toDNF (in progress)
                           testIsNNF, testIsNNF2, testIsNNF3, testIsNNF4, testIsNNF5, testIsNNF6,                -- isNNF                   
                           testIsNNF7, testIsNNF8, testIsNNF9, testIsNNF10, testIsNNF11, testIsNNF12,
@@ -1035,14 +1000,14 @@ main = do
                           testConvertFinalToUniversalNAnd, testConvertNotFinalToUniversalNAnd,                  -- toUniversalNAnd   
                           testConvertAndToUniversalNAnd, testConvertOrToUniversalNAnd,
                           testConvertNOrToUniversalNAnd, 
-                          -- testConvertXNOrToUniversalNAnd, testConvertImplyToUniversalNAnd,
-                          -- testConvertEquivToUniversalNAnd
-                          -- testConvertXOrToUniversalNAnd,
+                          testConvertXNOrToUniversalNAnd, testConvertImplyToUniversalNAnd,
+                          testConvertEquivToUniversalNAnd,
+                          testConvertXOrToUniversalNAnd,
                           testConvertFinalToUniversalNOr, testConvertNotFinalToUniversalNOr,                    -- toUniversalNOr   
                           testConvertAndToUniversalNOr, testConvertOrToUniversalNOr,
                           testConvertNAndToUniversalNOr, testConvertImplyToUniversalNOr,
-                          -- testConvertEquivToUniversalNOr
-                          -- testConvertXOrToUniversalNOr, testConvertXNOrToUniversalNOr, 
+                          testConvertEquivToUniversalNOr,
+                          testConvertXOrToUniversalNOr, testConvertXNOrToUniversalNOr, 
                           testIsUniversalNAnd, testIsUniversalNAnd2, testIsUniversalNAnd3,                      -- isUniversalNAnd
                           testIsUniversalNAnd4, testIsUniversalNAnd5,
                           testIsNotUniversalNAnd, testIsNotUniversalNAnd2, testIsNotUniversalNAnd3,
@@ -1077,9 +1042,4 @@ main = do
                             testExactlyWithEmptyList, testExactlyWithZero, testExactlyWithANegativeSize,        -- exactly
                             testExactlyWithATooBigSize, testExactlyWithOne, testExactlyWithTwo, testExactlyOne
                         ]
-    return()    
-
-
-    -- E : And (Or (Final "a") (Or (Final "b") (Or (Not (Final "c")) (Not (Final "a"))))) (And (Or (Final "a") (Or (Final "b") (Or (Not (Final "c")) (Not (Final "b"))))) (And (Or (Not (Final "a")) (Or (Not (Final "b")) (Or (Not (Final "c")) (Not (Final "a"))))) (Or (Not (Final "a")) (Or (Not (Final "b")) (Or (Not (Final "c")) (Not (Final "b")))))))
-    -- G : And (Or (Not (Or (And (Final "a") (Final "b")) (And (Not (Final "a")) (Not (Final "b"))))) (Not (Final "c"))) (Or (Not (Or (And (Final "a") (Final "b")) (And (Not (Final "a")) (Not (Final "b"))))) (Or (Not (Final "a")) (Not (Final "b"))))
-    -- m : And (Or (Not (Or (And (Final "a") (Final "b")) (And (Not (Final "a")) (Not (Final "b"))))) (Not (Final "c"))) (Or (Not (Or (And (Final "a") (Final "b")) (And (Not (Final "a")) (Not (Final "b"))))) (Or (Not (Final "a")) (Not (Final "b"))))
+    return()
