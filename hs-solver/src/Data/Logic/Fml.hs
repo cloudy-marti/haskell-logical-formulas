@@ -105,7 +105,6 @@ Fml (..)
   toNNF (Not (And p q))   = toNNF (NAnd p q)
   toNNF (Not(Equiv p q))  = Or  (And (toNNF p) (toNNF (Not q))) (And (toNNF (Not p)) (toNNF q))
   toNNF (Not(Imply p q))  = And  (toNNF p) (toNNF (Not q))
-
   toNNF (And p q)         = And (toNNF p) (toNNF q)
   toNNF (Or p q)          = Or  (toNNF p) (toNNF q)
   toNNF (Equiv p q)       = And (toNNF (Imply p q)) (toNNF (Imply q p))

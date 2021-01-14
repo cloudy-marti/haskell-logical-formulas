@@ -29,10 +29,7 @@ library:
   exposed-modules:
     - Data.Logic.Combinator
     - Data.Logic.Var
-    - Data.Logic.Var.Some
     - Data.Logic.Fml
-    - Data.Logic.Fml.Some
-    - Data.Logic.Utils
 
 tests:
   hs-solver-test:
