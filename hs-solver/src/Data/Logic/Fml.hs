@@ -98,6 +98,8 @@ Fml (..)
   
   -- |’toNNF’ @f@ converts the formula @f@ to NNF.
   toNNF :: Fml a -> Fml a
+  toNNF fml
+      | isNNF fml         = fml
   toNNF (Not (Not p))     = toNNF p
   toNNF (NAnd p q)        = Or  (toNNF (Not p)) (toNNF (Not q))
   toNNF (NOr p q)         = And (toNNF (Not p)) (toNNF (Not q))
@@ -113,7 +115,7 @@ Fml (..)
   toNNF (XNOr p q)        = Or  (And (toNNF p) (toNNF q)) (And (toNNF (Not p)) (toNNF (Not q)))
   -- XNor can also be implemented this way:
   -- toNNF (XNOr p q)        = And  (Or (toNNF (Not p)) (toNNF q)) (Or (toNNF p) (toNNF (Not q))) 
-  toNNF (Not p)           = Not (toNNF p)
+  toNNF (Not p)           = Not p
   toNNF (Final p)         = Final p
 
   -- |’toCNF’ @f@ converts the formula @f@ to CNF.
@@ -126,7 +128,7 @@ Fml (..)
                   Or (And p q) r -> And (toCNF' (Or p r)) (toCNF' (Or q r))
                   Or p q         -> Or  (toCNF' p) (toCNF' q)
                   And p q        -> And (toCNF' p) (toCNF' q)
-                  Not p          -> Not (toCNF' p)
+                  Not p          -> Not p
                   Final p        -> Final p
 
   -- |’toDNF’ @f@ converts the formula @f@ to DNF.
