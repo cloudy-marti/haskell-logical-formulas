@@ -186,7 +186,7 @@ Fml (..)
                   And p q        -> NAnd
                                      (NAnd (toUniversalNAnd' p) (toUniversalNAnd' q))
                                      (NAnd (toUniversalNAnd' p) (toUniversalNAnd' q))
-                  Not p          -> NAnd (toUniversalNAnd' p) (toUniversalNAnd' p)
+                  Not p          -> NAnd p p
                   Final p        -> Final p
 
   -- |’toUniversalNOr’ @p@ returns a NOR-formula that is equivalent
@@ -202,7 +202,7 @@ Fml (..)
                   And p q   -> NOr
                                  (NOr (toUniversalNOr' p) (toUniversalNOr' p))
                                  (NOr (toUniversalNOr' q) (toUniversalNOr' q))
-                  Not p     -> NOr (toUniversalNOr' p) (toUniversalNOr' p)
+                  Not p     -> NOr p p
                   Final p   -> Final p
 
   -- |’isUniversalNAnd’ @p@ returns true iff formula @p@ uses only NAND
