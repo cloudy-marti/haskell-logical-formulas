@@ -144,7 +144,6 @@ testConvertComplexFormulaToCNF2 =
                                c = Fml.Imply (Fml.Imply (Fml.Not va) vb) (Fml.Imply vb (Fml.Not vx)) 
 
 -------------------------------------------- toDNF TEST ------------------------------------------------------- 
--- TODO ADD OTHER TEST
 
 testDNF :: Test
 testDNF = 
@@ -978,6 +977,10 @@ testExactlyOne =
         )
         (Comb.exactlyOne [Var.mk i | i <- [1..4]])
 ---------------------------------------------- MAIN -----------------------------------------------------------
+
+-- Some tests are written but the expected result does not match with the actual result.
+-- It is most likely due to a lack of some simplifications while performing the transformation functions.
+-- If you want to perform the tests and see the results, please feel free to uncomment the commented lines below.
 main :: IO ()
 main = do
     -- FML
@@ -992,7 +995,7 @@ main = do
                           testConvertImplyFormulaToCNF, testConvertImplyFormulaToCNF2,                          -- toCNF
                           testConvertComplexFormulaToCNF, 
                           -- testConvertComplexFormulaToCNF2, 
-                          testDNF,                                                                              -- toDNF (in progress)
+                          testDNF,                                                                              -- toDNF
                           testIsNNF, testIsNNF2, testIsNNF3, testIsNNF4, testIsNNF5, testIsNNF6,                -- isNNF                   
                           testIsNNF7, testIsNNF8, testIsNNF9, testIsNNF10, testIsNNF11, testIsNNF12,
                           testIsNNF13, testIsNNF14, testIsNNF15,

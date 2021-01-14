@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8ef79ce5821a49eb8c82cd4ed5c3ec5dfa0e6ada6ab36f90ade30a11d2ea5169
+-- hash: 5234c53ff45640c69f0405d8f17a82afec1ccd1ec1ba78db818ffbb3d5ff01a1
 
 name:           hs-solver
 version:        0.1.0.0
@@ -31,10 +31,7 @@ library
   exposed-modules:
       Data.Logic.Combinator
       Data.Logic.Var
-      Data.Logic.Var.Some
       Data.Logic.Fml
-      Data.Logic.Fml.Some
-      Data.Logic.Utils
   other-modules:
       Paths_hs_solver
   hs-source-dirs:
@@ -49,7 +46,6 @@ test-suite hs-solver-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Data.Logic.CombTests
       Paths_hs_solver
   hs-source-dirs:
       test

@@ -207,14 +207,6 @@ Fml (..)
                   Not p     -> NOr p p
                   Final p   -> Final p
 
---   reduceUnivervalNandFormula :: Fml a -> Fml a
---   reduceUnivervalNandFormula fml = case fml of
---           NAnd (NAnd p q) (NAnd r s)            -> NAnd (reduceUnivervalNandFormula p) (reduceUnivervalNandFormula q)
---           -- NAnd (Final _) q                  -> reduceUnivervalNandFormula q
---           -- NAnd  p (Final _)                 -> reduceUnivervalNandFormula p
---           NAnd p q                          -> NAnd p q
---           Final a                           -> Final a
-
   -- |’isUniversalNAnd’ @p@ returns true iff formula @p@ uses only NAND
   -- and variables.
   isUniversalNAnd :: Fml a -> Bool
